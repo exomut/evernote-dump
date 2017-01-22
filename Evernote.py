@@ -8,9 +8,10 @@ import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
 import imp
 try:
-	imp.find_module('magic')
+	import magic
 except ImportError:
-	pip install filemagic
+	print 'Error: Module filemagic required. Run:'
+	print 'pip install filemagic'
 import magic # Needed to get the file extension because Evernotes caused errors
 
 
@@ -25,7 +26,6 @@ def decodeBase64(encoded, fileName):
 	# Write the file out
 	with file(fileName, 'wb') as outfile:
 		outfile.write(rawdata)
-
 
 class NoteHandler( xml.sax.ContentHandler ):
 	def __init__(self):
@@ -61,7 +61,7 @@ class NoteHandler( xml.sax.ContentHandler ):
 			# Counter incase a note has multiple attachments
 			self.dataCounter += 1
 
-			if not os.path.exists('output')
+			if not os.path.exists('output'):
 				os.makedirs('output')
 			fileName = 'output/' + self.created + str(self.dataCounter)
 			decodeBase64(self.file.read(), fileName)
