@@ -1,4 +1,5 @@
 #/usr/bin/python
+keepFileNames = False # Change this to true if you want original file names
 
 import xml.sax # Steaming XML data for use with larger files
 import base64 # For converting base64 Evernote attachments
@@ -10,21 +11,22 @@ import imp
 try:
 	import magic
 except ImportError:
-	print 'Error: Module filemagic required. Run:'
-	print 'pip install filemagic'
-import magic # Needed to get the file extension because Evernotes caused errors
+	print('\nError: Module filemagic required.')
+	print('https://pypi.python.org/pypi/filemagic')
+	print('Run: pip install filemagic\n')
+	sys.exit(1)
 
 
 # Decode and Export base64 to file
 def decodeBase64(encoded, fileName):
 	try:
 		rawdata = base64.b64decode(encoded)
-	except TypeError, te:
-		print 'TypeError: ', te
+	except TypeError:
+		print('TypeError: ')
 		raise SystemExit
 
 	# Write the file out
-	with file(fileName, 'wb') as outfile:
+	with file('temp/' + fileName, 'wb') as outfile:
 		outfile.write(rawdata)
 
 class NoteHandler( xml.sax.ContentHandler ):
@@ -32,6 +34,8 @@ class NoteHandler( xml.sax.ContentHandler ):
 		self.CurrentData = ""
 		self.title = ""
 		self.content = ""
+		self.filename = ""
+		self.timestamp = ""
 
 	# New element found
 	# Work with attributes such as: <en-media hash="kasd92">
@@ -42,45 +46,64 @@ class NoteHandler( xml.sax.ContentHandler ):
 		elif tag == "en-media":
 			hash = attributes["hash"]
 		elif tag == "data":
-			self.file = open('temp.enc', 'wa')
-			print "Start data read."
+			if not os.path.exists('temp'):
+				os.makedirs('temp')
+			self.file = open('temp/temp.enc', 'wa')
 
 	# When an element has finished reading this is called.
 	# Process the collected data
 	def endElement(self, tag):
 		if self.CurrentData == "title":
-			print "Title: ", self.title
+			print("Title: ", self.title)
 		elif self.CurrentData == "data":
 			self.file.close()
-		elif self.CurrentData == "mime":
-
+		if tag == "resource":
 			# I tried directly converting from memory, but it was too slow.
 			# Converting from a temp file sped up the process
-			self.file = open('temp.enc', 'r')
-
-			# Counter incase a note has multiple attachments
-			self.dataCounter += 1
+			self.file = open('temp/temp.enc', 'r')
 
 			if not os.path.exists('output'):
 				os.makedirs('output')
-			fileName = 'output/' + self.created + str(self.dataCounter)
+			fileName = self.created
 			decodeBase64(self.file.read(), fileName)
 			self.file.close()	
+			newFileName = ''
+			if self.filename and keepFileNames:
+				newFileName = 'output/' + self.filename	
+			else:
+				# Check the file for filetype and add the correct extension
+				# I tried using Evernote's Mime-Types but some png files were marked as jpg
+				print(fileName)
+				mime = magic.from_file('temp/' + fileName, mime=True)
+				self.extension = mimetypes.guess_extension(mime)
+				self.extension = self.extension.replace('.jpe', '.jpg')
+				newFileName = 'output/' + fileName + self.extension
 
-			# Check the file for filetype and add the correct extension
-			# I tried using Evernote's Mime-Types but some png files were marked as jpg
-			mime = magic.from_file(fileName, mime=True)
-			self.extension = mimetypes.guess_extension(mime)
-			self.extension = self.extension.replace('.jpe', '.jpg')
-			newFileName = fileName + self.extension
-			os.rename(fileName, newFileName)
+			# Check for files with the same name
+			doubleCounter = 2
+			tempFileName = newFileName
+			while os.path.exists(tempFileName):
+				if len(newFileName.rsplit('.',1)) > 1:
+					tempFileName = newFileName.rsplit('.', 1)[0] + \
+								  '-' + str(doubleCounter) + '.' + \
+								  newFileName.rsplit('.', 1)[1]
+				else:
+					tempFileName += '-' + str(doubleCounter)
+				doubleCounter += 1
+			newFileName = tempFileName
+			print(newFileName)	
+				
+			os.rename('temp/' + fileName, newFileName)
+
 
 			# Set the date and time of the note to the file modified and access
 			timeStamp = time.mktime(time.strptime(self.created, "%Y%m%dT%H%M%SZ"))
 			os.utime(newFileName, (timeStamp, timeStamp))
 
 			# Clean up temp files
-			os.remove('temp.enc')
+			os.remove('temp/temp.enc')
+			self.timestamp == ""
+			self.filename == ""
 
 	def characters(self, content):
 		if self.CurrentData == "title":
@@ -90,6 +113,12 @@ class NoteHandler( xml.sax.ContentHandler ):
 		elif self.CurrentData == "data":
 			# Remove linebreaks added in the enex file to prepare for decoding
 			self.file.write(content.rstrip('\n'))
+		elif self.CurrentData == "timestamp":
+			self.timestamp = content
+		elif self.CurrentData == "file-name":
+			self.filename = content
+			print(self.filename)
+
 
 if ( __name__ == "__main__"):
 
@@ -101,6 +130,6 @@ if ( __name__ == "__main__"):
 	#override the default ContextHandler
 	Handler = NoteHandler()
 	parser.setContentHandler( Handler )
-
+	
 	# pass in first argument as input file.
 	parser.parse(sys.argv[1])
