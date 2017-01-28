@@ -8,7 +8,7 @@ Evernote-dump works by streaming the .enex file through a parser so even extreme
 
 Before running the Evernote.py script be sure to install.
 
-pip install filemagic
+> pip install filemagic
 
 # Instructions
 
@@ -16,13 +16,16 @@ Run using
 
 > python Evernote.py FILE.enex
 
+All attachments found will be output the the "output" folder in the same directory as "Evernote.py"
+
 All the files found in the enex files will be put in the "output" folder
 
 # Road Map
 
-  -[x] Export all attachements
-  -[x] Keep the modified dates
-  -[x] Keep file names if desired
-  -[ ] Export actual notes
-  -[ ] Convert notes to mark down
-  -[ ] Make compatible with QownNotes
+- [x] Export all attachements
+- [x] Keep the modified dates
+- [x] Keep file names if desired
+- [ ] Don't depend on fileMagic since it doesn't play nice
+- [ ] Export actual notes
+- [ ] Convert notes to mark down
+- [ ] Make compatible with QownNotes

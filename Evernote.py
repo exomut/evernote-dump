@@ -8,45 +8,8 @@ import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
 import imp
 from fileManager import *
-
-try:
-	import magic
-except ImportError:
-	print('\nError: Module filemagic required.')
-	print('https://pypi.python.org/pypi/filemagic')
-	print('Run: pip install filemagic\n')
-	sys.exit(1)
+import magic
 	
-# Functions
-def makeDirCheck(path):
-	'''
-	path: location of new directory
-	
-	returns: True if directory was created, False if directory was found
-	'''
-	if not os.path.exists(path):
-		os.makedirs(path)
-		return True
-	return False
-
-def checkForDouble(path):
-	'''
-	path: to desired save point
-	
-	returns: a updated path if path double found
-	'''
-	doubleCounter = 2
-	tempFileName = path 
-	while os.path.exists(tempFileName):
-		if len(path.rsplit('.',1)) > 1:
-			tempFileName = path.rsplit('.', 1)[0] + \
-						  '-' + str(doubleCounter) + '.' + \
-						  path.rsplit('.', 1)[1]
-		else:
-			tempFileName += '-' + str(doubleCounter)
-		doubleCounter += 1
-	return tempFileName
-
 class NoteHandler( xml.sax.ContentHandler ):
 	def __init__(self):
 		self.CurrentData = ""
@@ -58,14 +21,16 @@ class NoteHandler( xml.sax.ContentHandler ):
 	# New element found
 	# Work with attributes such as: <en-media hash="kasd92">
 	def startElement(self, tag, attributes):
+		'''
+		Called when a new element is found
+		'''
 		self.CurrentData = tag
 		if tag == "title":
 			self.dataCounter = 0
 		elif tag == "en-media":
 			hash = attributes["hash"]
 		elif tag == "data":
-			makeDirCheck('temp')
-			self.file = open('temp/temp.enc', 'wa')
+			self.file = open(makeDirCheck('temp') + '/temp.enc', 'wa')
 
 	# When an element has finished reading this is called.
 	# Process the collected data
@@ -79,13 +44,12 @@ class NoteHandler( xml.sax.ContentHandler ):
 			# Converting from a temp file sped up the process
 			self.file = open('temp/temp.enc', 'r')
 
-			makeDirCheck('output')
 			fileName = self.created
 			decodeBase64(self.file.read(), fileName)
 			self.file.close()	
 			newFileName = ''
 			if self.filename and keepFileNames:
-				newFileName = 'output/' + self.filename	
+				newFileName = makeDirCheck('output') + '/' + self.filename	
 			else:
 				# Check the file for filetype and add the correct extension
 				# I tried using Evernote's Mime-Types but some png files were marked as jpg
