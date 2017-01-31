@@ -7,7 +7,7 @@ import sys
 import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
 import imp
-from fileManager import *
+from functions import *
 import magic
 	
 class NoteHandler( xml.sax.ContentHandler ):
@@ -87,6 +87,9 @@ class NoteHandler( xml.sax.ContentHandler ):
 
 
 if ( __name__ == "__main__"):
+
+	keepFileNames = isYesNo('Would you like to keep the original filenames' +
+					' if found?')
 
 	# create an XMLReader
 	parser = xml.sax.make_parser()
