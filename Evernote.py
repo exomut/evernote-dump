@@ -1,4 +1,6 @@
-#/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 keepFileNames = False # Change this to true if you want original file names
 
 import xml.sax # Steaming XML data for use with larger files
@@ -9,7 +11,7 @@ import time # Used to set the modified and access time of the file
 import imp
 from functions import *
 import magic
-	
+
 class NoteHandler( xml.sax.ContentHandler ):
 	def __init__(self):
 		self.CurrentData = ""
@@ -87,7 +89,8 @@ class NoteHandler( xml.sax.ContentHandler ):
 
 
 if ( __name__ == "__main__"):
-
+	
+	chooseLanguage()
 	keepFileNames = isYesNo('Would you like to keep the original filenames' +
 					' if found?')
 

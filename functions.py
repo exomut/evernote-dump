@@ -1,7 +1,11 @@
+#/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import base64 # For converting base64 Evernote attachments
 import os
 import sys
 from language import *
+selang = 'English'
 
 def checkForDouble(path):
 	'''
@@ -67,6 +71,32 @@ def isYesNo(phrase):
 			return False
 		print(lang('Please answer with "y" or "n" only.'))
 
+def lang(phrase):
+		if phrase in translation[selang]:
+			return translation[selang][phrase]
+		else:
+			return 'needs_translation_entry'
+
+def chooseLanguage():
+	global selang
+	phrase = ''
+	counter = 1
+	languages = []
+	for language in translation.keys():
+		phrase += '[' + str(counter) + ']' + language + ' '
+		languages.append(language)
+		counter += 1
+
+	while True:
+		if sys.version_info[:2] <= (2, 7):
+			result = int(raw_input(phrase))
+		else:
+			result = int(input(phrase))
+			
+		if result <= len(languages) and result > 0:
+			selang = languages[result -1] 
+			break
+		
 def makeDirCheck(path):
 	'''
 	# Check if path exists. If not found path is created
@@ -80,3 +110,23 @@ def makeDirCheck(path):
 		os.makedirs(path)
 
 	return path
+
+def multiChoice(inTuple):
+	'''
+	# Input a Tuple of choices.
+	# Returns the user's choice as tuple entry
+	'''
+	phrase = ''
+	for i in range(len(inTuple)):
+		phrase += inTuple[i] + '[' + str(i+1) + '] '
+
+	while True:
+		if sys.version_info[:2] <= (2, 7):
+			result = int(raw_input(phrase))
+		else:
+			result = int(input(phrase))
+
+		if result >= 0 and result < len(inTuple):
+			return result
+
+
