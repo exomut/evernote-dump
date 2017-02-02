@@ -9,11 +9,12 @@ import sys
 import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
 import imp
-from functions import *
 import magic
+from functions import *
 
 class NoteHandler( xml.sax.ContentHandler ):
 	def __init__(self):
+		self.magic = magic.Magic(mime=True)
 		self.CurrentData = ""
 		self.title = ""
 		self.content = ""
@@ -56,7 +57,7 @@ class NoteHandler( xml.sax.ContentHandler ):
 				# Check the file for filetype and add the correct extension
 				# I tried using Evernote's Mime-Types but some png files were marked as jpg
 				print(fileName)
-				mime = magic.from_file('temp/' + fileName, mime=True)
+				mime = self.magic.from_file('temp/' + fileName)
 				self.extension = mimetypes.guess_extension(mime)
 				self.extension = self.extension.replace('.jpe', '.jpg')
 				newFileName = 'output/' + fileName + self.extension
