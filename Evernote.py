@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-keepFileNames = False # Change this to true if you want original file names
+keepFileNames = False
 
 import xml.sax # Steaming XML data for use with larger files
 import os
@@ -10,6 +10,7 @@ import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
 import imp
 import magic
+import html2text # Convert html notes to markdown
 from functions import *
 
 class NoteHandler( xml.sax.ContentHandler ):
@@ -20,9 +21,11 @@ class NoteHandler( xml.sax.ContentHandler ):
 			self.magic = magic.Magic(mime=True)
 		self.CurrentData = ""
 		self.title = ""
+		self.note = ""
 		self.content = ""
 		self.filename = ""
 		self.timestamp = ""
+		self.html2text = html2text.HTML2Text()
 
 	# New element found
 	# Work with attributes such as: <en-media hash="kasd92">
@@ -33,6 +36,8 @@ class NoteHandler( xml.sax.ContentHandler ):
 		self.CurrentData = tag
 		if tag == "title":
 			self.dataCounter = 0
+		elif tag == "content":
+			self.note == ""
 		elif tag == "en-media":
 			hash = attributes["hash"]
 		elif tag == "data":
@@ -43,6 +48,12 @@ class NoteHandler( xml.sax.ContentHandler ):
 	def endElement(self, tag):
 		if self.CurrentData == "title":
 			print("Title: ", self.title)
+		elif self.CurrentData == "content":
+			with file(makeDirCheck('notes')+ '/' + self.title + '.md', 'wb') as outfile:
+				result = self.html2text.handle(self.note.decode('utf8'))
+				outfile.write(result.encode('utf-8'))
+				outfile.close()
+
 		elif self.CurrentData == "data":
 			self.file.close()
 		if tag == "resource":
@@ -85,6 +96,8 @@ class NoteHandler( xml.sax.ContentHandler ):
 	def characters(self, content):
 		if self.CurrentData == "title":
 			self.title = content
+		elif self.CurrentData == "content":
+			self.note += content.encode('utf-8')
 		elif self.CurrentData == "created":
 			self.created = content
 		elif self.CurrentData == "data":
