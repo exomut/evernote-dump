@@ -25,7 +25,9 @@ All the files found in the enex files will be put in the "output" folder
 - [x] Export all attachements
 - [x] Keep the modified dates
 - [x] Keep file names if desired
-- [ ] Don't depend on fileMagic since it doesn't play nice
+- [x] ~~Don't depend on fileMagic since it doesn't play nice~~ Now working correctly
+- [x] Make compatible with different versions of filemagic
+- [x] Make multilingual just for fun
 - [ ] Export actual notes
 - [ ] Convert notes to mark down
 - [ ] Make compatible with QownNotes

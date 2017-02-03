@@ -5,3 +5,4 @@ temp.enc
 tags
 *.pyc
 *.swp
+cleanup.sh

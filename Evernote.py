@@ -14,7 +14,10 @@ from functions import *
 
 class NoteHandler( xml.sax.ContentHandler ):
 	def __init__(self):
-		self.magic = magic.Magic(mime=True)
+		try:
+			self.magic = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
+		except AttributeError:
+			self.magic = magic.Magic(mime=True)
 		self.CurrentData = ""
 		self.title = ""
 		self.content = ""
@@ -57,10 +60,15 @@ class NoteHandler( xml.sax.ContentHandler ):
 				# Check the file for filetype and add the correct extension
 				# I tried using Evernote's Mime-Types but some png files were marked as jpg
 				print(fileName)
-				mime = self.magic.from_file('temp/' + fileName)
+				mime = None
+				try:
+					mime = self.magic.id_filename('temp/' + fileName)
+				except AttributeError:
+					mime = self.magic.from_file('temp/' + fileName)
+
 				self.extension = mimetypes.guess_extension(mime)
 				self.extension = self.extension.replace('.jpe', '.jpg')
-				newFileName = 'output/' + fileName + self.extension
+				newFileName = makeDirCheck('output/') + fileName + self.extension
 
 			newFileName = checkForDouble(newFileName)	
 			os.rename('temp/' + fileName, newFileName)
