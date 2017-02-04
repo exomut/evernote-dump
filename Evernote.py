@@ -5,6 +5,7 @@ keepFileNames = False
 
 import xml.sax # Steaming XML data for use with larger files
 import os
+import re
 import sys
 import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
@@ -22,7 +23,6 @@ class NoteHandler( xml.sax.ContentHandler ):
 		self.CurrentData = ""
 		self.title = ""
 		self.note = ""
-		self.content = ""
 		self.filename = ""
 		self.timestamp = ""
 		self.html2text = html2text.HTML2Text()
@@ -50,6 +50,9 @@ class NoteHandler( xml.sax.ContentHandler ):
 			print("Title: ", self.title)
 		elif self.CurrentData == "content":
 			with file(makeDirCheck('notes')+ '/' + self.title + '.md', 'wb') as outfile:
+				matches = re.findall(r'<en-media.*\/>', self.note)
+				for i in range(len(matches)):
+					self.note = self.note.replace(matches[i], "<img src='evernote-dump-file-place-marker" + str(i) + "' />")
 				result = self.html2text.handle(self.note.decode('utf8'))
 				outfile.write(result.encode('utf-8'))
 				outfile.close()
