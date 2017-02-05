@@ -1,6 +1,7 @@
 __pycache__/
 output/
 temp/
+notes/
 temp.enc
 tags
 *.pyc

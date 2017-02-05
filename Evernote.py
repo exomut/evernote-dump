@@ -24,13 +24,8 @@ class NoteHandler( xml.sax.ContentHandler ):
 			self.magic = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
 		except AttributeError:
 			self.magic = magic.Magic(mime=True)
-		self.CurrentData = ""
-		self.title = ""
-		self.note = ""
-		self.filename = ""
-		self.filenames = []
-		self.timestamp = ""
 		self.html2text = html2text.HTML2Text()
+		self.CurrentData = ""
 
 	# New element found
 	# Work with attributes such as: <en-media hash="kasd92">
@@ -40,9 +35,12 @@ class NoteHandler( xml.sax.ContentHandler ):
 		'''
 		self.CurrentData = tag
 		if tag == "title":
-			self.dataCounter = 0
 			self.title = ""
-			self.fileNames = []
+			self.note = ""
+			self.filename = ""
+			self.filenames = []
+			self.timestamp = ""
+			self.dataCounter = 0
 		elif tag == "content":
 			self.note == ""
 		elif tag == "en-media":
@@ -53,16 +51,21 @@ class NoteHandler( xml.sax.ContentHandler ):
 	# When an element has finished reading this is called.
 	# Process the collected data
 	def endElement(self, tag):
-		if self.CurrentData == "title":
-			print("Title: ", self.title)
-			print(makeFileTitle(self.title))
-		elif self.CurrentData == "content":
-			makeNote(self)
+		if self.CurrentData == "content":
+			result = makeNote(self)
+			print("---Exporting note: " + result)
 		elif self.CurrentData == "data":
 			self.file.close()
-		if tag == "resource":
+
+		if tag == "title":
+			print("\nProcessing note: " + self.title)
+		elif tag == "resource":
 			# Extract an all the attachement and get a list of extracted filenames
-			self.fileNames = extractAttachment(self)
+			self.filenames.append(extractAttachment(self))
+			print("---Exporting attachment: " + self.filenames[len(self.filenames)-1])
+		elif tag == "en-export":
+			self.magic.close()
+
 
 	def characters(self, content):
 		if self.CurrentData == "title":
@@ -78,9 +81,7 @@ class NoteHandler( xml.sax.ContentHandler ):
 			self.timestamp = content
 		elif self.CurrentData == "file-name":
 			self.filename = content
-			print(self.filename)
 	
-
 ###########################
 ## Non-Handler Functions ##
 ###########################
@@ -95,11 +96,10 @@ def extractAttachment(self):
 	self.file.close()	
 	newFileName = ''
 	if self.filename and keepFileNames:
-		newFileName = makeDirCheck('output') + '/' + self.filename	
+		newFileName = makeDirCheck('output') + '/' + makeFileTitle(self.filename)
 	else:
 		# Check the file for filetype and add the correct extension
 		# I tried using Evernote's Mime-Types but some png files were marked as jpg
-		print(fileName)
 		mime = None
 		try:
 			mime = self.magic.id_filename('temp/' + fileName)
@@ -109,7 +109,7 @@ def extractAttachment(self):
 		self.extension = mimetypes.guess_extension(mime)
 		self.extension = self.extension.replace('.jpe', '.jpg')
 		newFileName = makeDirCheck('output/') + fileName + self.extension
-
+	
 	newFileName = checkForDouble(newFileName)	
 	os.rename('temp/' + fileName, newFileName)
 
@@ -122,22 +122,25 @@ def extractAttachment(self):
 	self.timestamp == ""
 	self.filename == ""
 	
-	return [] #TODO list of filenames to be added in note
+	return newFileName
 
 def makeNote(self):
-	with file(makeDirCheck('notes')+ '/' + makeFileTitle(self.title) + '.md', 'wb') as outfile:
+	fileTitle = makeDirCheck('notes') + '/' + makeFileTitle(self.title) + '.md'
+	with file(fileTitle,'wb') as outfile:
 		matches = re.findall(r'<en-media[^>]*\/>', self.note)
 		for i in range(len(matches)):
 			self.note = self.note.replace(matches[i], "<img src='evernote-dump-file-place-marker" + str(i) + "' />")
 		result = self.html2text.handle(self.note.decode('utf8'))
 		outfile.write(result.encode('utf-8'))
 		outfile.close()
+	return fileTitle
 
 def makeFileTitle(title):
-		import unicodedata
-		title = unicodedata.normalize('NFKD', title).encode('ascii', 'ignore')
-		title = unicode(re.sub('[^\w\s-]', '', title).strip().lower())
-		title = unicode(re.sub('[-\s]+', '-', title))
+		'''
+		title: original title from note
+
+		returns: limited to 100 characters and hyphenated
+		'''
 		return title[0:100]
 
 
