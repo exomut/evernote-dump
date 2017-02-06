@@ -12,6 +12,7 @@ import time # Used to set the modified and access time of the file
 import imp
 import magic
 import html2text # Convert html notes to markdown
+import datetime
 from functions import *
 
 ############################
@@ -34,7 +35,9 @@ class NoteHandler( xml.sax.ContentHandler ):
 		Called when a new element is found
 		'''
 		self.CurrentData = tag
-		if tag == "title":
+		if tag == "en-export": # First tag found in .enex file
+			print("\n####EXPORT STARTED####")
+		elif tag == "note": # New note found
 			self.title = ""
 			self.note = ""
 			self.filename = ""
@@ -45,26 +48,28 @@ class NoteHandler( xml.sax.ContentHandler ):
 			self.note == ""
 		elif tag == "en-media":
 			hash = attributes["hash"]
-		elif tag == "data":
+		elif tag == "data": # Found an attachment
 			self.file = open(makeDirCheck('temp') + '/temp.enc', 'wa')
 
 	# When an element has finished reading this is called.
 	# Process the collected data
 	def endElement(self, tag):
-		if self.CurrentData == "content":
-			result = makeNote(self)
-			print("---Exporting note: " + result)
-		elif self.CurrentData == "data":
-			self.file.close()
-
 		if tag == "title":
 			print("\nProcessing note: " + self.title)
+		elif tag == "content":
+			result = makeNote(self)
+			print("---Exporting note: " + result)
 		elif tag == "resource":
-			# Extract an all the attachement and get a list of extracted filenames
+			# Extract all the attachements and get a list of extracted filenames
 			self.filenames.append(extractAttachment(self))
 			print("---Exporting attachment: " + self.filenames[len(self.filenames)-1])
-		elif tag == "en-export":
+		elif tag == "data":
+			self.file.close()
+		elif tag == "note": # Last tag called before starting a new note
+			print("Finalizing note...")	
+		elif tag == "en-export": #Last tag closed in the whole .enex file
 			self.magic.close()
+			print("\n####EXPORT COMPLETE####\n")
 
 
 	def characters(self, content):
@@ -91,7 +96,7 @@ def extractAttachment(self):
 	# Converting from a temp file sped up the process
 	self.file = open('temp/temp.enc', 'r')
 
-	fileName = self.created
+	fileName = datetime.datetime.strptime(self.created, "%Y%m%dT%H%M%SZ").strftime("%Y-%m-%d_%H-%M-%S")
 	decodeBase64(self.file.read(), fileName)
 	self.file.close()	
 	newFileName = ''
