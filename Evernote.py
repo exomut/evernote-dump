@@ -71,7 +71,6 @@ class NoteHandler( xml.sax.ContentHandler ):
 			self.magic.close()
 			print("\n####EXPORT COMPLETE####\n")
 
-
 	def characters(self, content):
 		if self.CurrentData == "title":
 			self.title += content
@@ -135,7 +134,8 @@ def makeNote(self):
 		matches = re.findall(r'<en-media[^>]*\/>', self.note)
 		for i in range(len(matches)):
 			self.note = self.note.replace(matches[i], "<img src='evernote-dump-file-place-marker" + str(i) + "' />")
-		result = self.html2text.handle(self.note.decode('utf8'))
+		self.note = ("<h1>" + self.title + "</h1>" + self.note.decode('utf-8')).encode('utf-8')
+		result = self.html2text.handle(self.note.decode('utf-8'))
 		outfile.write(result.encode('utf-8'))
 		outfile.close()
 	return fileTitle
