@@ -5,14 +5,14 @@ keepFileNames = False
 
 import xml.sax # Steaming XML data for use with larger files
 import os
-import re
+import re # Regex module for extracting note attachments
 import sys
 import mimetypes # Converts mime file types into an extension
 import time # Used to set the modified and access time of the file
+import datetime
 import imp
 import magic
 import html2text # Convert html notes to markdown
-import datetime
 from functions import *
 
 ############################
@@ -40,8 +40,10 @@ class NoteHandler( xml.sax.ContentHandler ):
 		elif tag == "note": # New note found
 			self.title = ""
 			self.note = ""
+			self.notemd = ""
 			self.filename = ""
-			self.filenames = []
+			self.attachfilename = ""
+			self.attachfilenames = []
 			self.timestamp = ""
 			self.dataCounter = 0
 		elif tag == "content":
@@ -57,15 +59,17 @@ class NoteHandler( xml.sax.ContentHandler ):
 		if tag == "title":
 			print("\nProcessing note: " + self.title)
 		elif tag == "content":
-			result = makeNote(self)
-			print("---Exporting note: " + result)
+			makeNote(self)
+			print("---Exporting note: " + self.filename)
 		elif tag == "resource":
 			# Extract all the attachements and get a list of extracted filenames
-			self.filenames.append(extractAttachment(self))
-			print("---Exporting attachment: " + self.filenames[len(self.filenames)-1])
+			self.attachfilenames.append(extractAttachment(self))
+			print("---Exporting attachment: " + self.attachfilenames[len(self.attachfilenames)-1])
 		elif tag == "data":
 			self.file.close()
 		elif tag == "note": # Last tag called before starting a new note
+#TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
+			writeNote(self)
 			print("Finalizing note...")	
 		elif tag == "en-export": #Last tag closed in the whole .enex file
 			self.magic.close()
@@ -84,7 +88,7 @@ class NoteHandler( xml.sax.ContentHandler ):
 		elif self.CurrentData == "timestamp":
 			self.timestamp = content
 		elif self.CurrentData == "file-name":
-			self.filename = content
+			self.attachfilename = content
 	
 ###########################
 ## Non-Handler Functions ##
@@ -99,8 +103,8 @@ def extractAttachment(self):
 	decodeBase64(self.file.read(), fileName)
 	self.file.close()	
 	newFileName = ''
-	if self.filename and keepFileNames:
-		newFileName = makeDirCheck('output') + '/' + makeFileTitle(self.filename)
+	if self.attachfilename and keepFileNames:
+		newFileName = makeDirCheck('Notes/media/') + makeFileTitle(self.attachfilename)
 	else:
 		# Check the file for filetype and add the correct extension
 		# I tried using Evernote's Mime-Types but some png files were marked as jpg
@@ -112,8 +116,7 @@ def extractAttachment(self):
 
 		self.extension = mimetypes.guess_extension(mime)
 		self.extension = self.extension.replace('.jpe', '.jpg')
-		newFileName = makeDirCheck('output/') + fileName + self.extension
-	
+		newFileName = makeDirCheck('Notes/media/') + fileName + self.extension
 	newFileName = checkForDouble(newFileName)	
 	os.rename('temp/' + fileName, newFileName)
 
@@ -124,21 +127,26 @@ def extractAttachment(self):
 	# Clean up temp files
 	os.remove('temp/temp.enc')
 	self.timestamp == ""
-	self.filename == ""
+	self.attachfilename == ""
 	
 	return newFileName
 
 def makeNote(self):
-	fileTitle = makeDirCheck('notes') + '/' + makeFileTitle(self.title) + '.md'
-	with file(fileTitle,'wb') as outfile:
-		matches = re.findall(r'<en-media[^>]*\/>', self.note)
-		for i in range(len(matches)):
-			self.note = self.note.replace(matches[i], "<img src='evernote-dump-file-place-marker" + str(i) + "' />")
-		self.note = ("<h1>" + self.title + "</h1>" + self.note.decode('utf-8')).encode('utf-8')
-		result = self.html2text.handle(self.note.decode('utf-8'))
-		outfile.write(result.encode('utf-8'))
+	self.filename = makeDirCheck('Notes') + '/' + makeFileTitle(self.title) + '.md'
+	# Find all attachment links in notes
+	matches = re.findall(r'<en-media[^>]*\/>', self.note)
+	# Replace all attachments links with a placeholder
+	for i in range(len(matches)):
+		self.note = self.note.replace(matches[i], "<img src='evernote-dump-file-place-marker" + str(i) + "' />")
+	# Insert a title to be parsed in markdown
+	self.note = ("<h1>" + self.title + "</h1>" + self.note.decode('utf-8')).encode('utf-8')
+	# Convert to markdown
+	self.notemd = self.html2text.handle(self.note.decode('utf-8')).encode('utf-8')
+
+def writeNote(self):
+	with file(self.filename,'wb') as outfile:
+		outfile.write(self.notemd)
 		outfile.close()
-	return fileTitle
 
 def makeFileTitle(title):
 		'''
@@ -156,6 +164,7 @@ if ( __name__ == "__main__"):
 
 	# create an XMLReader
 	parser = xml.sax.make_parser()
+
 	# turn off namespaces
 	parser.setFeature(xml.sax.handler.feature_namespaces, 0)
 
