@@ -12,11 +12,15 @@ Before running the Evernote.py script be sure to install.
 
 > pip install html2text
 
+# Warning
+
+This is extremely in the alpha phase. I did a proof of concept and now I am working more seriously on a cleaner coded version. The proof of concept version can be found in the **alpha** folder.
+
 # Instructions
 
 Run using
 
-> python Evernote.py FILE.enex
+> python evernote_dump.py FILE.enex
 
 All attachments found will be output the the "output" folder in the same directory as "Evernote.py"
 
@@ -25,7 +29,7 @@ All the files found in the enex files will be put in the "output" folder
 # Road Map
 
 - [x] Export all attachements.
-- [x] Keep the modified dates.
+- [ ] Keep the modified dates.
 - [x] Keep file names if desired.
 - [x] ~~Don't depend on fileMagic since it doesn't play nice~~ Now working correctly.
 - [x] Make compatible with different versions of filemagic.

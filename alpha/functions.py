@@ -8,7 +8,7 @@ from language import *
 selang = 'English'
 
 def checkForDouble(path):
-        '''
+    '''
     # Check file path and modifies it if a duplicate is found.
     # Used for creating new files.
     # Works with file extensions too.

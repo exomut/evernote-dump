@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-keepFileNames = False
+#############
+## IMPORTS ##
+#############
 
 import xml.sax # Steaming XML data for use with larger files
 import os
@@ -83,6 +85,7 @@ class NoteHandler( xml.sax.ContentHandler ):
         elif self.CurrentData == "created":
             self.created = content
         elif self.CurrentData == "data":
+
             # Remove linebreaks added in the enex file to prepare for decoding
             self.file.write(content.rstrip('\n'))
         elif self.CurrentData == "timestamp":
@@ -93,7 +96,6 @@ class NoteHandler( xml.sax.ContentHandler ):
 ###########################
 ## Non-Handler Functions ##
 ###########################
-
 def extractAttachment(self):
     # I tried directly converting from memory, but it was too slow.
     # Converting from a temp file sped up the process
