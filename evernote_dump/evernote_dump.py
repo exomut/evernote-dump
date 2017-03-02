@@ -28,12 +28,18 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.magic = magic.Magic(mime=True)
         self.html2text = html2text.HTML2Text()
         self.CurrentData = ""
+        self.in_resource = False
 
     def startElement(self, tag, attributes):
         '''
         Called when a new element is found
         '''
         self.CurrentData = tag
+
+        # if self.in_resource:
+            
+            
+
         if tag == "en-export": # First tag found in .enex file
             print("\n####EXPORT STARTED####")
         elif tag == "note": # New note found
@@ -42,16 +48,21 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment = Attachment()
             self.attachment.set_filename(self.note.title)
             print("---Exporting attachment: ")
+        elif tag == "resource":
+            self.in_resource = True
+        
+        
     
     def endElement(self, tag):
         if tag == "title":
-            print("\nProcessing note: " + self.note.title)
+            print("\nProcessing note: " + self.note.get_title())
         elif tag == "content":
-            print("---Exporting note: " + self.note.filename)
+            print("---Exporting note: " + self.note.get_filename())
         elif tag == "resource":
             self.attachment.finalize(keep_file_names)
+            self.in_resource = False
         elif tag == "data":
-            self.note.attachments.append(self.attachment)
+            self.note.add_attachment(self.attachment)
         elif tag == "note": # Last tag called before starting a new note
             #TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
             print("Finalizing note...")    

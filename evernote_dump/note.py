@@ -9,44 +9,53 @@ import datetime
 ################
 
 class Note(object):
-    EVERNOTE_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
+    __EVERNOTE_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
         # Extracted
-        self.title = "CHANGE ME"
-        self.html = ""
-        self.created_date = ""
-        self.updated_date = ""
-        self.tags = []
-        self.attributes = {}
-        self.attr_latitude = None
-        self.attr_longitude = None
-        self.attr_altitude = None
-        self.attr_author = None
+        self.__title = "CHANGE ME"
+        self.__html = ""
+        self.__created_date = ""
+        self.__updated_date = ""
+        self.__tags = []
+        self.__attributes = {}
+        self.__attr_latitude = None
+        self.__attr_longitude = None
+        self.__attr_altitude = None
+        self.__attr_author = None
         # Resources/Attachments
-        self.attachments = []
+        self.__attachments = []
         # Created
-        self.filename = ""
-        self.markdown = ""
+        self.__filename = ""
+        self.__markdown = ""
+
+    def add_attachment(self, attachment):
+        self.__attachments.append(attachment)
 
     def append_html(self, text):
-        self.html += text
+        self.__html += text
     
     def append_to_notemd(self, text):
         """Adds a new line of text to the markdown version of the note"""
-        self.notemd += "\n" + text
+        self.__notemd += "\n" + text
 
     def create_filename(self):
-        self.filename = self.title[:100] + ".md"
+        self.__filename = self.__title[:100] + ".md"
         
     def finalize(self):
         """Output the note to a file"""
-       
+
+    def get_filename(self):
+        return self.__filename
+
+    def get_title(self):
+        return self.__title
+
     def new_attachment(self, filename):
-        self.attachments.append(Attachment(filename))
+        self.__attachments.append(Attachment(filename))
         
     def set_created(self, date_string):
         """Converts a date in string format to a datetime"""
-        self.created_date = datetime.datetime.strptime(date_string, self.EVERNOTE_DATE_FORMAT)
+        self.__created_date = datetime.datetime.strptime(date_string, self.__EVERNOTE_DATE_FORMAT)
         
 
 ######################
@@ -59,39 +68,39 @@ import mimetypes # Converts mime file types into an extension
 class Attachment(object):
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
-        self.filename = ""
-        self.mime = ""
-        self.base64data = ""
-        self.rawdata = ""
-        self.attributes = {}
+        self.__filename = ""
+        self.__mime = ""
+        self.__base64data = ""
+        self.__rawdata = ""
+        self.__attributes = {}
     
     def add_found_attribute(self, attr, dataline):
-        self.attributes[attr] = dataline
+        self.__attributes[attr] = dataline
 
     def create_filename(self, keep_file_names):
         base = ""
         extension = ""
-        if self.filename.count('.') >= 1:
-            extension = self.filename.split('.')[-1]
-            base = self.filename.rstrip('.' + extension)
+        if self.__filename.count('.') >= 1:
+            extension = self.__filename.split('.')[-1]
+            base = self.__filename.rstrip('.' + extension)
         else:
-            print(self.mime)
-            extension = mimetypes.guess_extension(self.mime)
+            print(self.__mime)
+            extension = mimetypes.guess_extension(self.__mime)
             extension = extension.replace('.jpe', '.jpg')
         
         if keep_file_names:
             # Limit filename length to 100 characters
-            self.filename = base[:100] + '.' + extension
+            self.__filename = base[:100] + '.' + extension
         else:
-            self.filename = "somedate" # TODO
+            self.__filename = "somedate" # TODO
 
     def finalize(self, keep_file_names):
         self.create_filename(keep_file_names)
         self.decodeBase64()
         #TODO newFileName = checkForDouble(newFileName)    
-        with open(makeDirCheck('Notes/media/') + self.filename,'wb') as outfile:
-            outfile.write(self.rawdata)
-        self.rawdata = ""
+        with open(makeDirCheck('Notes/media/') + self.__filename,'wb') as outfile:
+            outfile.write(self.__rawdata)
+        self.__rawdata = ""
         
     def get_extention(self, mimetype):
         if filename.count('.') >= 1:
@@ -101,18 +110,18 @@ class Attachment(object):
             return extension.replace('.jpe', '.jpg')
 
     def data_stream_in(self, dataline):
-        self.base64data += dataline.rstrip('\n')
+        self.__base64data += dataline.rstrip('\n')
     
     def decodeBase64(self):
         ''' Decode base64 to memory '''
         try:
-            self.rawdata = base64.b64decode(self.base64data)
-            self.base64data = ""
+            self.__rawdata = base64.b64decode(self.__base64data)
+            self.__base64data = ""
         except TypeError:
             raise SystemExit
 
     def set_filename(self, filename):
-        self.filename = filename
+        self.__filename = filename
 
     def set_mime(self, mime):
-        self.mime = mime
+        self.__mime = mime

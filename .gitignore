@@ -7,7 +7,7 @@ tags
 *.pyc
 *.swp
 cleanup.sh
-
+evernote_dump/tags
 .project
 .pydevproject
 .settings/
