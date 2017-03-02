@@ -8,9 +8,7 @@ Evernote-dump works by streaming the .enex file through a parser so even extreme
 
 Before running the Evernote.py script be sure to install.
 
-> pip install filemagic
-
-> pip install html2text
+> pip install -r requirements.txt
 
 # Warning
 

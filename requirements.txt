@@ -1,0 +1,2 @@
+filemagic
+html2text
