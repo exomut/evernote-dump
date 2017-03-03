@@ -3,6 +3,23 @@
 
 from helpers import *
 import datetime
+import html2text # Convert html notes to markdown
+
+###########################
+## Non-Handler Functions ##
+###########################
+def extractAttachment(self):
+
+    fileName = datetime.datetime.strptime(self.created, "%Y%m%dT%H%M%SZ").strftime("%Y-%m-%d_%H-%M-%S")
+    newFileName = ''
+    newFileName = checkForDouble(newFileName)    
+    os.rename('temp/' + fileName, newFileName)
+
+    # Set the date and time of the note to the file modified and access
+    timeStamp = datetime.time.mktime(datetime.time.strptime(self.created, "%Y%m%dT%H%M%SZ"))
+    os.utime(newFileName, (timeStamp, timeStamp))
+    
+    return newFileName
 
 ################
 ## Note Class ##
