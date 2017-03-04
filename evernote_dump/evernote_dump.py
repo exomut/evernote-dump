@@ -5,9 +5,10 @@
 ## IMPORTS ##
 #############
 
+import sys
 import xml.sax # Steaming XML data for use with larger files
 from note import Note, Attachment
-from helpers import *
+from helpers import isYesNo, chooseLanguage
 
 ############################
 ## Note Handler Functions ##
@@ -17,7 +18,7 @@ class NoteHandler( xml.sax.ContentHandler ):
     def __init__(self):
         #self.html2text = html2text.HTML2Text()
         self.CurrentData = ""
-        self.in_resource = False
+        self.in_resource_attributes = False
 
     ########################
     ## ELEMENT READ START ##
@@ -27,8 +28,6 @@ class NoteHandler( xml.sax.ContentHandler ):
         Called when a new element is found
         '''
         self.CurrentData = tag
-        # if self.in_resource:
-
         if tag == "en-export": # First tag found in .enex file
             print("\n####EXPORT STARTED####")
         elif tag == "note": # New note found
@@ -38,8 +37,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
             print("---Exporting attachment: ")
-        elif tag == "resource":
-            self.in_resource = True
+        elif tag == "resource-attributes":
+            self.in_resource_attributes = True
         
         
     
@@ -53,7 +52,7 @@ class NoteHandler( xml.sax.ContentHandler ):
             print("---Exporting note: " + self.note.get_filename())
         elif tag == "resource":
             self.attachment.finalize(keep_file_names)
-            self.in_resource = False
+            self.in_resource_attributes = False
         elif tag == "data":
             self.note.add_attachment(self.attachment)
         elif tag == "note": # Last tag called before starting a new note
@@ -78,6 +77,9 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment.set_mime(content_stream)
         elif self.CurrentData == "file-name":
             self.attachment.set_filename(content_stream)
+        
+        if self.in_resource_attributes:
+            self.attachment.add_found_attribute(self.CurrentData, content_stream)
 
 if ( __name__ == "__main__"):
 
