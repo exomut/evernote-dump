@@ -50,6 +50,9 @@ class Note(object):
 
     def append_html(self, text):
         self.__html += text
+        
+    def append_tag(self, tag):
+        self.__tags.append(tag)
     
     def append_to_notemd(self, text):
         """Adds a new line of text to the markdown version of the note"""
@@ -75,6 +78,9 @@ class Note(object):
         
     def set_created_date(self, date_string):
         self.__created_date = datetime.strptime(date_string, self.__ISO_DATE_FORMAT)
+        
+    def set_title(self, title):
+        self.__title = title
         
 
 ######################
@@ -135,6 +141,9 @@ class Attachment(object):
         else:
             extension = mimetypes.guess_extension(mimetype)
             return extension.replace('.jpe', '.jpg')
+        
+    def get_filename(self):
+        return self.__filename
 
     def data_stream_in(self, dataline):
         self.__base64data += dataline.rstrip('\n')
