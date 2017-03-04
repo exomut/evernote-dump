@@ -5,8 +5,9 @@ import os
 import sys
 from language import translation
 
-def checkForDouble(path):
+def checkForDouble(path, filename):
     '''
+    # Make sure the path has a trailing /
     # Check file path and modifies it if a duplicate is found.
     # Used for creating new files.
     # Works with file extensions too.
@@ -16,12 +17,12 @@ def checkForDouble(path):
     returns: an updated path if path double found
     '''
     doubleCounter = 2
-    tempFileName = path 
-    while os.path.exists(tempFileName):
-        if len(path.rsplit('.',1)) > 1:
-            tempFileName = path.rsplit('.', 1)[0] + \
+    tempFileName = filename 
+    while os.path.exists(path + tempFileName):
+        if len(filename.rsplit('.',1)) > 1:
+            tempFileName = filename.rsplit('.', 1)[0] + \
                           '-' + str(doubleCounter) + '.' + \
-                          path.rsplit('.', 1)[1]
+                          filename.rsplit('.', 1)[1]
         else:
             tempFileName += '-' + str(doubleCounter)
         doubleCounter += 1

@@ -26,7 +26,6 @@ def extractAttachment(self):
 ## Note Class ##
 ################
 class Note(object):
-    __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
         # Extracted
@@ -86,6 +85,8 @@ import base64
 import mimetypes # Converts mime file types into an extension
 
 class Attachment(object):
+    __NOTE_ATTATCHMENT_PATH = "Notes/media/"
+    __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
         self.__created_date = datetime.now()
@@ -99,27 +100,30 @@ class Attachment(object):
         self.__attributes[attr] = dataline
 
     def create_filename(self, keep_file_names):
-        base = ""
-        extension = ""
+        __base = ""
+        __extension = ""
+
         if self.__filename.count('.') >= 1:
-            extension = self.__filename.split('.')[-1]
-            base = self.__filename.rstrip('.' + extension)
+            __extension = self.__filename.split('.')[-1]
+            __base = self.__filename.rstrip('.' + __extension)
         else:
-            print(self.__mime)
-            extension = mimetypes.guess_extension(self.__mime)
-            extension = extension.replace('.jpe', '.jpg')
+            """Create an extension if no original filename found."""
+            __extension = mimetypes.guess_extension(self.__mime, False)[1:]
+            if __extension == "jpe":
+                __extension = "jpg"
         
         if keep_file_names:
             # Limit filename length to 100 characters
-            self.__filename = base[:100] + '.' + extension
+            self.__filename = __base[:100] + '.' + __extension
         else:
-            self.__filename = "somedate" # TODO
-        #TODO newFileName = checkForDouble(newFileName)    
+            self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension
+
+        self.__filename = checkForDouble(self.__NOTE_ATTATCHMENT_PATH,  self.__filename)    
 
     def finalize(self, keep_file_names):
         self.create_filename(keep_file_names)
         self.decodeBase64()
-        __path = makeDirCheck('Notes/media/') + self.__filename
+        __path = makeDirCheck(self.__NOTE_ATTATCHMENT_PATH) + self.__filename
         with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
         os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
