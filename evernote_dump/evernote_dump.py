@@ -36,7 +36,6 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment = Attachment()
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
-            print("---Exporting attachment: ")
         elif tag == "resource-attributes":
             self.in_resource_attributes = True
         
@@ -53,6 +52,7 @@ class NoteHandler( xml.sax.ContentHandler ):
         elif tag == "resource":
             self.attachment.finalize(keep_file_names)
             self.in_resource_attributes = False
+            print("---Exported attachment: " + self.attachment.get_filename())
         elif tag == "data":
             self.note.add_attachment(self.attachment)
         elif tag == "note": # Last tag called before starting a new note
@@ -66,11 +66,13 @@ class NoteHandler( xml.sax.ContentHandler ):
     #########################
     def characters(self, content_stream):
         if self.CurrentData == "title":
-            self.note.title = content_stream
+            self.note.set_title(content_stream)
         elif self.CurrentData == "content":
             self.note.append_html(content_stream)
         elif self.CurrentData == "created":
             self.note.set_created_date(content_stream)
+        elif self.CurrentData == "tag":
+            self.note.append_tag(content_stream)
         elif self.CurrentData == "data":
             self.attachment.data_stream_in(content_stream)
         elif self.CurrentData == "mime":
