@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from helpers import *
-import datetime
+from datetime import datetime
 import html2text # Convert html notes to markdown
+
 
 ###########################
 ## Non-Handler Functions ##
 ###########################
 def extractAttachment(self):
 
-    fileName = datetime.datetime.strptime(self.created, "%Y%m%dT%H%M%SZ").strftime("%Y-%m-%d_%H-%M-%S")
+    ## fileName = datetime.datetime.strptime(self.created, __ISO_DATE_FORMAT).strftime(__TIME_FORMAT)
     newFileName = ''
     newFileName = checkForDouble(newFileName)    
-    os.rename('temp/' + fileName, newFileName)
+    ## os.rename('temp/' + fileName, newFileName)
 
     # Set the date and time of the note to the file modified and access
-    timeStamp = datetime.time.mktime(datetime.time.strptime(self.created, "%Y%m%dT%H%M%SZ"))
+    timeStamp = datetime.time.mktime(self.__created)
     os.utime(newFileName, (timeStamp, timeStamp))
     
     return newFileName
@@ -24,15 +25,15 @@ def extractAttachment(self):
 ################
 ## Note Class ##
 ################
-
 class Note(object):
-    __EVERNOTE_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
+    __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
+    __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
         # Extracted
-        self.__title = "CHANGE ME"
+        self.__title = ""
         self.__html = ""
-        self.__created_date = ""
-        self.__updated_date = ""
+        self.__created_date = datetime.now()
+        self.__updated_date = self.__created_date
         self.__tags = []
         self.__attributes = {}
         self.__attr_latitude = None
@@ -61,6 +62,9 @@ class Note(object):
     def finalize(self):
         """Output the note to a file"""
 
+    def get_created_date(self):
+        return self.__created_date
+    
     def get_filename(self):
         return self.__filename
 
@@ -70,9 +74,8 @@ class Note(object):
     def new_attachment(self, filename):
         self.__attachments.append(Attachment(filename))
         
-    def set_created(self, date_string):
-        """Converts a date in string format to a datetime"""
-        self.__created_date = datetime.datetime.strptime(date_string, self.__EVERNOTE_DATE_FORMAT)
+    def set_created_date(self, date_string):
+        self.__created_date = datetime.strptime(date_string, self.__ISO_DATE_FORMAT)
         
 
 ######################
@@ -85,6 +88,7 @@ import mimetypes # Converts mime file types into an extension
 class Attachment(object):
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
+        self.__created_date = datetime.now()
         self.__filename = ""
         self.__mime = ""
         self.__base64data = ""
@@ -110,18 +114,20 @@ class Attachment(object):
             self.__filename = base[:100] + '.' + extension
         else:
             self.__filename = "somedate" # TODO
+        #TODO newFileName = checkForDouble(newFileName)    
 
     def finalize(self, keep_file_names):
         self.create_filename(keep_file_names)
         self.decodeBase64()
-        #TODO newFileName = checkForDouble(newFileName)    
-        with open(makeDirCheck('Notes/media/') + self.__filename,'wb') as outfile:
+        __path = makeDirCheck('Notes/media/') + self.__filename
+        with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
+        os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
         self.__rawdata = ""
         
     def get_extention(self, mimetype):
-        if filename.count('.') >= 1:
-            return '.' + filename.split('.')[-1]
+        if self.__filename.count('.') >= 1:
+            return '.' + self.__filename.split('.')[-1]
         else:
             extension = mimetypes.guess_extension(mimetype)
             return extension.replace('.jpe', '.jpg')
@@ -136,6 +142,9 @@ class Attachment(object):
             self.__base64data = ""
         except TypeError:
             raise SystemExit
+
+    def set_created_date(self, created_date):
+        self.__created_date = created_date
 
     def set_filename(self, filename):
         self.__filename = filename

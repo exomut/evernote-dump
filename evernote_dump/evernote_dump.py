@@ -6,8 +6,6 @@
 #############
 
 import xml.sax # Steaming XML data for use with larger files
-import sys
-
 from note import Note, Attachment
 from helpers import *
 
@@ -37,7 +35,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.note = Note()
         elif tag == "data": # Found an attachment
             self.attachment = Attachment()
-            self.attachment.set_filename(self.note.title)
+            self.attachment.set_created_date(self.note.get_created_date())
+            self.attachment.set_filename(self.note.get_title())
             print("---Exporting attachment: ")
         elif tag == "resource":
             self.in_resource = True
@@ -72,7 +71,7 @@ class NoteHandler( xml.sax.ContentHandler ):
         elif self.CurrentData == "content":
             self.note.append_html(content_stream)
         elif self.CurrentData == "created":
-            self.note.set_created(content_stream)
+            self.note.set_created_date(content_stream)
         elif self.CurrentData == "data":
             self.attachment.data_stream_in(content_stream)
         elif self.CurrentData == "mime":
