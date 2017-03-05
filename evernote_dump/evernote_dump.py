@@ -48,7 +48,7 @@ class NoteHandler( xml.sax.ContentHandler ):
         if tag == "title":
             print("\nProcessing note: " + self.note.get_title())
         elif tag == "content":
-            print("---Exporting note: " + self.note.get_filename())
+            pass
         elif tag == "resource":
             self.attachment.finalize(keep_file_names)
             self.in_resource_attributes = False
@@ -57,6 +57,7 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.note.add_attachment(self.attachment)
         elif tag == "note": # Last tag called before starting a new note
             #TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
+            print("---Exporting note: " + self.note.get_filename())
             print("Finalizing note...")    
         elif tag == "en-export": #Last tag closed in the whole .enex file
             print("\n####EXPORT COMPLETE####\n")

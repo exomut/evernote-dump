@@ -6,7 +6,7 @@ Evernote-dump works by streaming the .enex file through a parser so even extreme
 
 # Installation
 
-Before running the Evernote.py script be sure to install.
+Before running the evernote_dump.py script be sure to install.
 
 > pip install -r requirements.txt
 
@@ -30,8 +30,8 @@ All the files found in the enex files will be put in the "output" folder
 - [ ] Keep the modified dates.
 - [x] Keep file names if desired.
 - [x] ~~Don't depend on fileMagic since it doesn't play nice~~ Now working correctly.
-- [x] Make compatible with different versions of filemagic.
 - [x] Make multilingual just for fun.
+    - [ ] Add multilingual to processing text.
 - [ ] Export actual notes.
   - [ ] Add links to the images that were extracted.
 - [ ] Convert notes to mark down.
