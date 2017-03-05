@@ -34,6 +34,7 @@ All the files found in the enex files will be put in the "output" folder
     - [ ] Add multilingual to processing text.
 - [ ] Export actual notes.
   - [ ] Add links to the images that were extracted.
+  - [ ] Add recourse attributes.
 - [ ] Convert notes to mark down.
 - [ ] Make compatible with QownNotes.
 - [ ] Add more error check to combat human errors

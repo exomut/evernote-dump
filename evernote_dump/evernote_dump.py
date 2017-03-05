@@ -59,6 +59,7 @@ class NoteHandler( xml.sax.ContentHandler ):
             #TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
             print("---Exporting note: " + self.note.get_filename())
             print("Finalizing note...")    
+            self.note.finalize()
         elif tag == "en-export": #Last tag closed in the whole .enex file
             print("\n####EXPORT COMPLETE####\n")
 

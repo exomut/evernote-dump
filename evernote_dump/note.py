@@ -3,6 +3,7 @@
 
 from helpers import *
 from datetime import datetime
+import re # Regex module for extracting note attachments
 import html2text # Convert html notes to markdown
 
 
@@ -26,8 +27,10 @@ def extractAttachment(self):
 ## Note Class ##
 ################
 class Note(object):
+    __NOTE_PATH = "Notes/"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
+        self.html2text = html2text.HTML2Text()
         # Extracted
         self.__title = ""
         self.__html = ""
@@ -59,10 +62,31 @@ class Note(object):
         self.__notemd += "\n" + text
 
     def create_filename(self):
-        self.__filename = self.__title[:100] + ".md"
+        self.__filename = checkForDouble(makeDirCheck(self.__NOTE_PATH),  self.__title[:100] + ".md")    
+    
+    def create_markdown(self):
+        # Find all attachment links in notes
+        matches = re.findall(r'<en-media[^>]*\/>', self.__html)
+        # Replace all attachments links with a placeholder
+        for i in range(len(matches)):
+            self.__html = self.__html.replace(matches[i], '[note-attachment-' + str(i) + '][' + str(i) + ']')
+        # Insert a title to be parsed in markdown
+        # self.__html = ("<h1>" + self.__title + "</h1>" + self.__html.decode('utf-8')).encode('utf-8')
+        self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
+        # Convert to markdown
+        self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
+        self.creat_markdown_attachments()
+        with open(self.__NOTE_PATH + self.__filename,'w') as outfile:
+            outfile.write(self.__markdown)
+            
+    def creat_markdown_attachments(self):
+        if len(self.__attachments) > 0:
+            for i in range(len(self.__attachments)):
+                self.__markdown += "\n" + "[" + str(i) + "]: media/" + self.__attachments[i].get_filename()
         
     def finalize(self):
         """Output the note to a file"""
+        self.create_markdown()
 
     def get_created_date(self):
         return self.__created_date
@@ -81,6 +105,7 @@ class Note(object):
         
     def set_title(self, title):
         self.__title = title
+        self.create_filename()
         
 
 ######################
