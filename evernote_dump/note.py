@@ -71,7 +71,9 @@ class Note(object):
         # Replace all attachments links with a placeholder
         for i in range(len(matches)):
             hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
-            self.__html = self.__html.replace(matches[i], '[note-attachment-' + str(i) + '][' + hash[0] + ']')
+            if_image = ""
+            if "image" in matches[i]: if_image = "!"
+            self.__html = self.__html.replace(matches[i], if_image + '[note-attachment-' + str(i) + '][' + hash[0] + ']\n')
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         # Convert to markdown
