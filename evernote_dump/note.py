@@ -5,6 +5,7 @@ from helpers import *
 from datetime import datetime
 import re # Regex module for extracting note attachments
 import html2text # Convert html notes to markdown
+from feedparser import binascii
 
 
 ###########################
@@ -69,9 +70,9 @@ class Note(object):
         matches = re.findall(r'<en-media[^>]*\/>', self.__html)
         # Replace all attachments links with a placeholder
         for i in range(len(matches)):
-            self.__html = self.__html.replace(matches[i], '[note-attachment-' + str(i) + '][' + str(i) + ']')
+            hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
+            self.__html = self.__html.replace(matches[i], '[note-attachment-' + str(i) + '][' + hash[0] + ']')
         # Insert a title to be parsed in markdown
-        # self.__html = ("<h1>" + self.__title + "</h1>" + self.__html.decode('utf-8')).encode('utf-8')
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         # Convert to markdown
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
@@ -82,7 +83,7 @@ class Note(object):
     def creat_markdown_attachments(self):
         if len(self.__attachments) > 0:
             for i in range(len(self.__attachments)):
-                self.__markdown += "\n" + "[" + str(i) + "]: media/" + self.__attachments[i].get_filename()
+                self.__markdown += "\n" + "[" + self.__attachments[i].get_hash() + "]: media/" + self.__attachments[i].get_filename()
         
     def finalize(self):
         """Output the note to a file"""
@@ -114,6 +115,7 @@ class Note(object):
 
 import base64
 import mimetypes # Converts mime file types into an extension
+import hashlib
 
 class Attachment(object):
     __NOTE_ATTATCHMENT_PATH = "Notes/media/"
@@ -157,6 +159,9 @@ class Attachment(object):
         __path = makeDirCheck(self.__NOTE_ATTATCHMENT_PATH) + self.__filename
         with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
+        md5 = hashlib.md5()
+        md5.update(self.__rawdata)
+        self.__hash = binascii.hexlify(md5.digest()).decode()
         os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
         self.__rawdata = ""
         
@@ -169,6 +174,9 @@ class Attachment(object):
         
     def get_filename(self):
         return self.__filename
+    
+    def get_hash(self):
+        return self.__hash
 
     def data_stream_in(self, dataline):
         self.__base64data += dataline.rstrip('\n')
