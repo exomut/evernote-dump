@@ -5,7 +5,7 @@ from helpers import *
 from datetime import datetime
 import re # Regex module for extracting note attachments
 import html2text # Convert html notes to markdown
-from feedparser import binascii
+import binascii
 
 
 ###########################
@@ -70,22 +70,23 @@ class Note(object):
         matches = re.findall(r'<en-media[^>]*\/>', self.__html)
         # Replace all attachments links with a placeholder
         for i in range(len(matches)):
-            hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
+            _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
             if_image = ""
             if "image" in matches[i]: if_image = "!"
-            self.__html = self.__html.replace(matches[i], if_image + '[note-attachment-' + str(i) + '][' + hash[0] + ']\n')
+            self.__html = self.__html.replace(matches[i], '\n' + if_image + '[noteattachment' + str(i) + '][' + _hash[0] + ']')
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         # Convert to markdown
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
-        self.creat_markdown_attachments()
+        self.create_markdown_attachments()
         with open(self.__NOTE_PATH + self.__filename,'w') as outfile:
             outfile.write(self.__markdown)
             
-    def creat_markdown_attachments(self):
+    def create_markdown_attachments(self):
         if len(self.__attachments) > 0:
             for i in range(len(self.__attachments)):
                 self.__markdown += "\n" + "[" + self.__attachments[i].get_hash() + "]: media/" + self.__attachments[i].get_filename()
+                self.__markdown += self.__attachments[i].get_attributes()
         
     def finalize(self):
         """Output the note to a file"""
@@ -129,10 +130,10 @@ class Attachment(object):
         self.__mime = ""
         self.__base64data = ""
         self.__rawdata = ""
-        self.__attributes = {}
+        self.__attributes = []
     
     def add_found_attribute(self, attr, dataline):
-        self.__attributes[attr] = dataline
+        self.__attributes.append([attr, dataline])
 
     def create_filename(self, keep_file_names):
         __base = ""
@@ -167,6 +168,14 @@ class Attachment(object):
         os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
         self.__rawdata = ""
         
+    def get_attributes(self):
+        export = ""
+        if len(self.__attributes) > 0:
+            for attr in self.__attributes:
+                export += "\n---" + attr[0] + ": " + attr[1]
+            export +=  "\n"
+        return export
+
     def get_extention(self, mimetype):
         if self.__filename.count('.') >= 1:
             return '.' + self.__filename.split('.')[-1]
