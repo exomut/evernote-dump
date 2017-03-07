@@ -84,6 +84,7 @@ class Note(object):
             
     def create_markdown_attachments(self):
         if len(self.__attachments) > 0:
+            self.__markdown += "\n---\n### ATTACHMENTS"
             for i in range(len(self.__attachments)):
                 self.__markdown += "\n" + "[" + self.__attachments[i].get_hash() + "]: media/" + self.__attachments[i].get_filename()
                 self.__markdown += self.__attachments[i].get_attributes()
@@ -122,6 +123,7 @@ import hashlib
 
 class Attachment(object):
     __NOTE_ATTATCHMENT_PATH = "Notes/media/"
+    __MEDIA_PATH = "media/"
     __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
@@ -136,7 +138,7 @@ class Attachment(object):
         self.__attributes.append([attr, dataline])
 
     def create_filename(self, keep_file_names):
-        __base = ""
+        __base = self.__filename
         __extension = ""
 
         if self.__filename.count('.') >= 1:
@@ -147,13 +149,14 @@ class Attachment(object):
             __extension = mimetypes.guess_extension(self.__mime, False)[1:]
             if __extension == "jpe":
                 __extension = "jpg"
-        
-        if keep_file_names:
+
+        if keep_file_names and __base:
             # Limit filename length to 100 characters
             self.__filename = __base[:100] + '.' + __extension
         else:
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension
-
+        
+        self.__filename = self.__filename.replace(" ", "_")
         self.__filename = checkForDouble(self.__NOTE_ATTATCHMENT_PATH,  self.__filename)    
 
     def finalize(self, keep_file_names):
@@ -170,9 +173,11 @@ class Attachment(object):
         
     def get_attributes(self):
         export = ""
+        export += "\n[" + self.__filename + "](" + self.__MEDIA_PATH + self.__filename + ")"
         if len(self.__attributes) > 0:
+            export += "\n>hash: " + self.__hash + "  "
             for attr in self.__attributes:
-                export += "\n---" + attr[0] + ": " + attr[1]
+                export += "\n>" + attr[0] + ": " + attr[1] + "  "
             export +=  "\n"
         return export
 
