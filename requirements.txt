@@ -1,2 +1,1 @@
-filemagic
 html2text

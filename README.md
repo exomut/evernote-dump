@@ -32,7 +32,6 @@ This is extremely in the alpha phase. I did a proof of concept and now I am work
 - [x] Export all attachements.
 - [x] Keep the modified dates.
 - [x] Keep file names if desired.
-- [x] ~~Don't depend on fileMagic since it doesn't play nice~~ Now working correctly.
 - [x] Make multilingual just for fun.
     - [ ] Add multilingual to processing text.
 - [x] Export actual notes.

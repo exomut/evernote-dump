@@ -29,6 +29,7 @@ def extractAttachment(self):
 ################
 class Note(object):
     __NOTE_PATH = "Notes/"
+    __MEDIA_PATH = "media/"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
         self.html2text = html2text.HTML2Text()
@@ -61,11 +62,9 @@ class Note(object):
     def append_to_notemd(self, text):
         """Adds a new line of text to the markdown version of the note"""
         self.__notemd += "\n" + text
-
-    def create_filename(self):
-        self.__filename = checkForDouble(makeDirCheck(self.__NOTE_PATH),  self.__title[:100] + ".md")    
-    
-    def create_markdown(self):
+        
+    def clean_html(self):
+        """Cleans self.__html and prepares it for markdown conversion."""
         # Find all attachment links in notes
         matches = re.findall(r'<en-media[^>]*\/>', self.__html)
         # Replace all attachments links with a placeholder
@@ -73,9 +72,19 @@ class Note(object):
             _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
             if_image = ""
             if "image" in matches[i]: if_image = "!"
-            self.__html = self.__html.replace(matches[i], '\n' + if_image + '[noteattachment' + str(i) + '][' + _hash[0] + ']')
+
+            #self.__html = self.__html.replace(matches[i], '\n' + if_image + '[noteattachment' + str(i) + '][' + _hash[0] + ']')
+            placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
+            self.__html = self.__html.replace(matches[i], placeholder)
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
+        
+        
+    def create_filename(self):
+        self.__filename = checkForDouble(makeDirCheck(self.__NOTE_PATH),  self.__title[:100] + ".md")    
+    
+    def create_markdown(self):
+        self.clean_html()
         # Convert to markdown
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         self.create_markdown_attachments()
@@ -83,10 +92,12 @@ class Note(object):
             outfile.write(self.__markdown)
             
     def create_markdown_attachments(self):
+        """Appends the attachment information in markdown format to self.__markdown"""
         if len(self.__attachments) > 0:
-            self.__markdown += "\n---\n### ATTACHMENTS"
+            self.__markdown += "\n---"
+            self.__markdown += "\n### ATTACHMENTS"
             for i in range(len(self.__attachments)):
-                self.__markdown += "\n" + "[" + self.__attachments[i].get_hash() + "]: media/" + self.__attachments[i].get_filename()
+                self.__markdown += "\n[%s]: %s%s" % (self.__attachments[i].get_hash(), self.__MEDIA_PATH, self.__attachments[i].get_filename())
                 self.__markdown += self.__attachments[i].get_attributes()
         
     def finalize(self):
@@ -122,8 +133,9 @@ import mimetypes # Converts mime file types into an extension
 import hashlib
 
 class Attachment(object):
-    __NOTE_ATTATCHMENT_PATH = "Notes/media/"
+    __NOTE_PATH = "Notes/"
     __MEDIA_PATH = "media/"
+    __NOTE_ATTATCHMENT_PATH = __NOTE_PATH + __MEDIA_PATH
     __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
@@ -172,12 +184,11 @@ class Attachment(object):
         self.__rawdata = ""
         
     def get_attributes(self):
-        export = ""
-        export += "\n[" + self.__filename + "](" + self.__MEDIA_PATH + self.__filename + ")"
+        export = "\n[%s](%s%s)" % (self.__filename, self.__MEDIA_PATH, self.__filename)
         if len(self.__attributes) > 0:
-            export += "\n>hash: " + self.__hash + "  "
+            export += "\n>hash: %s  " % (self.__hash)
             for attr in self.__attributes:
-                export += "\n>" + attr[0] + ": " + attr[1] + "  "
+                export += "\n>%s: %s  " % (attr[0], attr[1])
             export +=  "\n"
         return export
 
