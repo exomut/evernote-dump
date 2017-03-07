@@ -16,7 +16,6 @@ from helpers import isYesNo, chooseLanguage
 
 class NoteHandler( xml.sax.ContentHandler ):
     def __init__(self):
-        #self.html2text = html2text.HTML2Text()
         self.CurrentData = ""
         self.in_resource_attributes = False
 
@@ -32,8 +31,10 @@ class NoteHandler( xml.sax.ContentHandler ):
             print("\n####EXPORT STARTED####")
         elif tag == "note": # New note found
             self.note = Note()
+            self.note.set_path(current_file)
         elif tag == "data": # Found an attachment
             self.attachment = Attachment()
+            self.attachment.set_path(current_file)
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
         elif tag == "resource-attributes":
@@ -101,5 +102,11 @@ if ( __name__ == "__main__"):
     Handler = NoteHandler()
     parser.setContentHandler( Handler )
     
-    # pass in first argument as input file.
-    parser.parse(sys.argv[1])
+    for i in range(1,len(sys.argv)):
+        # pass in first argument as input file.
+        if ".enex" in sys.argv[i]:
+            current_file = sys.argv[i].replace(".enex", "/")
+            try:
+                parser.parse(sys.argv[i])
+            except:
+                print(sys.argv[i] + " was unable to be parsed correctly.")

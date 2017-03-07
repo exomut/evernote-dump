@@ -28,7 +28,6 @@ def extractAttachment(self):
 ## Note Class ##
 ################
 class Note(object):
-    __NOTE_PATH = "Notes/"
     __MEDIA_PATH = "media/"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     def __init__(self):
@@ -44,6 +43,7 @@ class Note(object):
         self.__attr_longitude = None
         self.__attr_altitude = None
         self.__attr_author = None
+        self.__path = ""
         # Resources/Attachments
         self.__attachments = []
         # Created
@@ -81,14 +81,14 @@ class Note(object):
         
         
     def create_filename(self):
-        self.__filename = checkForDouble(makeDirCheck(self.__NOTE_PATH),  self.__title[:100] + ".md")    
+        self.__filename = checkForDouble(makeDirCheck(self.__path),  self.__title[:100] + ".md")    
     
     def create_markdown(self):
         self.clean_html()
         # Convert to markdown
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         self.create_markdown_attachments()
-        with open(self.__NOTE_PATH + self.__filename,'w') as outfile:
+        with open(self.__path + self.__filename,'w') as outfile:
             outfile.write(self.__markdown)
             
     def create_markdown_attachments(self):
@@ -118,6 +118,9 @@ class Note(object):
         
     def set_created_date(self, date_string):
         self.__created_date = datetime.strptime(date_string, self.__ISO_DATE_FORMAT)
+
+    def set_path(self, path):
+        self.__path = path
         
     def set_title(self, title):
         self.__title = title
@@ -133,9 +136,7 @@ import mimetypes # Converts mime file types into an extension
 import hashlib
 
 class Attachment(object):
-    __NOTE_PATH = "Notes/"
     __MEDIA_PATH = "media/"
-    __NOTE_ATTATCHMENT_PATH = __NOTE_PATH + __MEDIA_PATH
     __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
@@ -145,6 +146,7 @@ class Attachment(object):
         self.__base64data = ""
         self.__rawdata = ""
         self.__attributes = []
+        self.path = ""
     
     def add_found_attribute(self, attr, dataline):
         self.__attributes.append([attr, dataline])
@@ -169,12 +171,12 @@ class Attachment(object):
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension
         
         self.__filename = self.__filename.replace(" ", "_")
-        self.__filename = checkForDouble(self.__NOTE_ATTATCHMENT_PATH,  self.__filename)    
+        self.__filename = checkForDouble(self.__path + self.__MEDIA_PATH,  self.__filename)    
 
     def finalize(self, keep_file_names):
         self.create_filename(keep_file_names)
         self.decodeBase64()
-        __path = makeDirCheck(self.__NOTE_ATTATCHMENT_PATH) + self.__filename
+        __path = makeDirCheck(self.__path + self.__MEDIA_PATH) + self.__filename
         with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
         md5 = hashlib.md5()
@@ -224,3 +226,6 @@ class Attachment(object):
 
     def set_mime(self, mime):
         self.__mime = mime
+    
+    def set_path(self, path):
+        self.__path = path

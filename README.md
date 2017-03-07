@@ -14,11 +14,19 @@ Before running the evernote_dump.py script be sure to install.
 
 Run using
 
-> python evernote_dump.py FILE.enex
+> python evernote_dump.py FILE.enex  
+>  
+> or  
+>  
+> For exporting all enex files in a folder, use:  
+>  
+> python everntoe_dump.py *  
+>  
+> it will weed out all other non-enex files.
 
-All attachments found will be output the the "Notes/media" folder as where you called evernote_dump.py .
+All attachments found will be output the the "ENEX-FILE-NAME-ROOT/media" folder as where you called evernote_dump.py .
 
-All the files found in the enex files will be put in the "Notes" folder
+All the files found in the enex files will be put in the folder
 
 # Warning
 
@@ -28,7 +36,7 @@ This is extremely in the alpha phase. I did a proof of concept and now I am work
 
 - [ ] Export Note Attributes
     - [ ] Export Tags
-- [ ] Allow multiple files and export to seperate folders.
+- [x] Allow multiple files and export to seperate folders.
 - [x] Export all attachements.
 - [x] Keep the modified dates.
 - [x] Keep file names if desired.

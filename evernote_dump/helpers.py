@@ -66,7 +66,7 @@ def chooseLanguage():
     phrase = ''
     counter = 1
     languages = []
-    for language in translation.keys():
+    for language in sorted(translation.keys()):
         phrase += '[' + str(counter) + ']' + language + ' '
         languages.append(language)
         counter += 1
