@@ -34,8 +34,8 @@ This is extremely in the alpha phase. I did a proof of concept and now I am work
 
 # TODO
 
-- [ ] Export Note Attributes
-    - [ ] Export Tags
+- [x] Export Note Attributes
+    - [x] Export Tags
 - [x] Allow multiple files and export to seperate folders.
 - [x] Export all attachements.
 - [x] Keep the modified dates.
