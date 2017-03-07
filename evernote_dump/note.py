@@ -30,6 +30,7 @@ def extractAttachment(self):
 class Note(object):
     __MEDIA_PATH = "media/"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
+    __TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     def __init__(self):
         self.html2text = html2text.HTML2Text()
         # Extracted
@@ -38,11 +39,7 @@ class Note(object):
         self.__created_date = datetime.now()
         self.__updated_date = self.__created_date
         self.__tags = []
-        self.__attributes = {}
-        self.__attr_latitude = None
-        self.__attr_longitude = None
-        self.__attr_altitude = None
-        self.__attr_author = None
+        self.__attributes = []
         self.__path = ""
         # Resources/Attachments
         self.__attachments = []
@@ -52,6 +49,9 @@ class Note(object):
 
     def add_attachment(self, attachment):
         self.__attachments.append(attachment)
+
+    def add_found_attribute(self, attr, dataline):
+        self.__attributes.append([attr, dataline])
 
     def append_html(self, text):
         self.__html += text
@@ -88,6 +88,9 @@ class Note(object):
         # Convert to markdown
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         self.create_markdown_attachments()
+        self.create_markdown_note_attr()
+        if len(self.__tags) > 0:
+            self.create_markdown_note_tags()
         with open(self.__path + self.__filename,'w') as outfile:
             outfile.write(self.__markdown)
             
@@ -99,7 +102,24 @@ class Note(object):
             for i in range(len(self.__attachments)):
                 self.__markdown += "\n[%s]: %s%s" % (self.__attachments[i].get_hash(), self.__MEDIA_PATH, self.__attachments[i].get_filename())
                 self.__markdown += self.__attachments[i].get_attributes()
+                
+    def create_markdown_note_attr(self):
+        self.__markdown += "\n---"
+        self.__markdown += "\n### NOTE ATTRIBUTES"
+        self.__markdown += "\n>Created Date: " + self.__created_date.strftime(self.__TIME_FORMAT) + "  "
+        self.__markdown += "\n>Last Evernote Update Date: " + self.__updated_date.strftime(self.__TIME_FORMAT) + "  "
+        if len(self.__attributes) > 0:
+            for attr in self.__attributes:
+                self.__markdown += "\n>%s: %s  " % (attr[0], attr[1])
         
+    def create_markdown_note_tags(self):
+        self.__markdown += "\n\n---"
+        self.__markdown += "\n### TAGS\n"
+        tags = ""
+        for tag in self.__tags:
+            tags += tag + ","
+        self.__markdown += tags[:-1]
+
     def finalize(self):
         """Output the note to a file"""
         self.create_markdown()
@@ -118,6 +138,9 @@ class Note(object):
         
     def set_created_date(self, date_string):
         self.__created_date = datetime.strptime(date_string, self.__ISO_DATE_FORMAT)
+    
+    def set_updated_date(self, date_string):
+        self.__updated_date = datetime.strptime(date_string, self.__ISO_DATE_FORMAT)
 
     def set_path(self, path):
         self.__path = path

@@ -17,6 +17,7 @@ from helpers import isYesNo, chooseLanguage
 class NoteHandler( xml.sax.ContentHandler ):
     def __init__(self):
         self.CurrentData = ""
+        self.in_note_attributes = False
         self.in_resource_attributes = False
 
     ########################
@@ -37,6 +38,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment.set_path(current_file)
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
+        elif tag == "note-attributes":
+            self.in_note_attributes = True
         elif tag == "resource-attributes":
             self.in_resource_attributes = True
         
@@ -61,6 +64,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             print("---Exporting note: " + self.note.get_filename())
             print("Finalizing note...")    
             self.note.finalize()
+        elif tag == "note-attributes":
+            self.in_note_attributes = False
         elif tag == "en-export": #Last tag closed in the whole .enex file
             print("\n####EXPORT COMPLETE####\n")
 
@@ -74,6 +79,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.note.append_html(content_stream)
         elif self.CurrentData == "created":
             self.note.set_created_date(content_stream)
+        elif self.CurrentData == "updated":
+            self.note.set_updated_date(content_stream)
         elif self.CurrentData == "tag":
             self.note.append_tag(content_stream)
         elif self.CurrentData == "data":
@@ -83,6 +90,8 @@ class NoteHandler( xml.sax.ContentHandler ):
         elif self.CurrentData == "file-name":
             self.attachment.set_filename(content_stream)
         
+        if self.in_note_attributes:
+            self.note.add_found_attribute(self.CurrentData, content_stream)
         if self.in_resource_attributes:
             self.attachment.add_found_attribute(self.CurrentData, content_stream)
 
