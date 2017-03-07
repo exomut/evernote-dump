@@ -1,8 +1,8 @@
 # evernote-dump
 
-Get all of your attachments out of your exported Evernote enex file and include the correct file dates.
+Get all of your attachments out of your exported Evernote enex file and include the correct file modified dates. Also, your notes will be exported to markdown format.
 
-Evernote-dump works by streaming the .enex file through a parser so even extremely large .enex files should work.
+Evernote-dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
 # Installation
 
@@ -10,35 +10,38 @@ Before running the evernote_dump.py script be sure to install.
 
 > pip install -r requirements.txt
 
-# Warning
-
-This is extremely in the alpha phase. I did a proof of concept and now I am working more seriously on a cleaner coded version. The proof of concept version can be found in the **alpha** folder.
-
 # Instructions
 
 Run using
 
 > python evernote_dump.py FILE.enex
 
-All attachments found will be output the the "output" folder in the same directory as "Evernote.py"
+All attachments found will be output the the "Notes/media" folder as where you called evernote_dump.py .
 
-All the files found in the enex files will be put in the "output" folder
+All the files found in the enex files will be put in the "Notes" folder
 
-# Road Map
+# Warning
 
+This is extremely in the alpha phase. I did a proof of concept and now I am working more seriously on a cleaner coded version. The proof of concept version can be found in the **alpha** folder.
+
+# TODO
+
+- [ ] Export Note Attributes
+    - [ ] Export Tags
+- [ ] Allow multiple files and export to seperate folders.
 - [x] Export all attachements.
-- [ ] Keep the modified dates.
+- [x] Keep the modified dates.
 - [x] Keep file names if desired.
 - [x] ~~Don't depend on fileMagic since it doesn't play nice~~ Now working correctly.
 - [x] Make multilingual just for fun.
     - [ ] Add multilingual to processing text.
-- [ ] Export actual notes.
-  - [ ] Add links to the images that were extracted.
-  - [ ] Add recourse attributes.
-- [ ] Convert notes to mark down.
-- [ ] Make compatible with QownNotes.
+- [x] Export actual notes.
+  - [x] Add links to the images that were extracted.
+  - [x] Add resourse attributes.
+- [x] Convert notes to mark down.
 - [ ] Add more error check to combat human errors
 - [x] Get rid of cleanup warning.
+- [ ] Clean up the code!
 
 # Evernote Enex File Map
 
