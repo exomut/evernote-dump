@@ -42,8 +42,6 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.in_note_attributes = True
         elif tag == "resource-attributes":
             self.in_resource_attributes = True
-        
-        
     
     #########################
     ## ELEMENT READ FINISH ##

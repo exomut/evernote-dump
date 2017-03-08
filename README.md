@@ -1,8 +1,10 @@
-# evernote-dump
+# Evernote Dump
 
-Get all of your attachments out of your exported Evernote enex file and include the correct file modified dates. Also, your notes will be exported to markdown format.
+Export extract evernote notes and attachments from .enex files.
 
-Evernote-dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
+All notes and attachments will keep their original file created and accessed dates. Notes will be converted to markdown format. Tags and other embedded information will be formatted and added to the end of each note.
+
+Evernote Dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
 # Installation
 
@@ -28,10 +30,6 @@ All attachments found will be output the the "ENEX-FILE-NAME-ROOT/media" folder 
 
 All the files found in the enex files will be put in the folder
 
-# Warning
-
-This is extremely in the alpha phase. I did a proof of concept and now I am working more seriously on a cleaner coded version. The proof of concept version can be found in the **alpha** folder.
-
 # TODO
 
 - [x] Export Note Attributes
@@ -46,9 +44,9 @@ This is extremely in the alpha phase. I did a proof of concept and now I am work
   - [x] Add links to the images that were extracted.
   - [x] Add resourse attributes.
 - [x] Convert notes to mark down.
-- [ ] Add more error check to combat human errors
+- [x] Add more error check to combat human errors
 - [x] Get rid of cleanup warning.
-- [ ] Clean up the code!
+- [x] Clean up the code!
 
 # Evernote Enex File Map
 
