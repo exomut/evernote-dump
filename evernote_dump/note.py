@@ -5,24 +5,6 @@ from helpers import *
 from datetime import datetime
 import re # Regex module for extracting note attachments
 import html2text # Convert html notes to markdown
-import binascii
-
-
-###########################
-## Non-Handler Functions ##
-###########################
-def extractAttachment(self):
-
-    ## fileName = datetime.datetime.strptime(self.created, __ISO_DATE_FORMAT).strftime(__TIME_FORMAT)
-    newFileName = ''
-    newFileName = checkForDouble(newFileName)    
-    ## os.rename('temp/' + fileName, newFileName)
-
-    # Set the date and time of the note to the file modified and access
-    timeStamp = datetime.time.mktime(self.__created)
-    os.utime(newFileName, (timeStamp, timeStamp))
-    
-    return newFileName
 
 ################
 ## Note Class ##
@@ -60,11 +42,11 @@ class Note(object):
         self.__tags.append(tag)
     
     def append_to_notemd(self, text):
-        """Adds a new line of text to the markdown version of the note"""
+        # Adds a new line of text to the markdown version of the note
         self.__notemd += "\n" + text
         
     def clean_html(self):
-        """Cleans self.__html and prepares it for markdown conversion."""
+        # Cleans self.__html and prepares it for markdown conversion.
         # Find all attachment links in notes
         matches = re.findall(r'<en-media[^>]*\/>', self.__html)
         # Replace all attachments links with a placeholder
@@ -79,23 +61,28 @@ class Note(object):
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         
+    def convert_html_to_markdown(self):
+        self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         
+    def create_file(self):
+        with open(self.__path + self.__filename,'w') as outfile:
+            outfile.write(self.__markdown)
+        os.utime(self.__path, (self.__created_date.timestamp(), self.__updated_date.timestamp()))
+
     def create_filename(self):
         self.__filename = checkForDouble(makeDirCheck(self.__path),  self.__title[:100] + ".md")    
     
     def create_markdown(self):
         self.clean_html()
-        # Convert to markdown
-        self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
+        self.convert_html_to_markdown()
         self.create_markdown_attachments()
         self.create_markdown_note_attr()
         if len(self.__tags) > 0:
             self.create_markdown_note_tags()
-        with open(self.__path + self.__filename,'w') as outfile:
-            outfile.write(self.__markdown)
+        self.create_file()
             
     def create_markdown_attachments(self):
-        """Appends the attachment information in markdown format to self.__markdown"""
+        # Appends the attachment information in markdown format to self.__markdown
         if len(self.__attachments) > 0:
             self.__markdown += "\n---"
             self.__markdown += "\n### ATTACHMENTS"
@@ -121,7 +108,6 @@ class Note(object):
         self.__markdown += tags[:-1]
 
     def finalize(self):
-        """Output the note to a file"""
         self.create_markdown()
 
     def get_created_date(self):
@@ -149,14 +135,14 @@ class Note(object):
         self.__title = title
         self.create_filename()
         
-
 ######################
 ## ATTACHMENT CLASS ##
 ######################
 
-import base64
+import base64 # Decodes base64
 import mimetypes # Converts mime file types into an extension
-import hashlib
+import hashlib # Used to get md5 hash from attachments
+import binascii # Used to convert hash output to string
 
 class Attachment(object):
     __MEDIA_PATH = "media/"
@@ -169,11 +155,19 @@ class Attachment(object):
         self.__base64data = ""
         self.__rawdata = ""
         self.__attributes = []
-        self.path = ""
+        self.__path = ""
     
     def add_found_attribute(self, attr, dataline):
         self.__attributes.append([attr, dataline])
 
+    def create_file(self):
+        # Create the file and set the original timestamps
+        __path = makeDirCheck(self.__path + self.__MEDIA_PATH) + self.__filename
+        with open(__path,'wb') as outfile:
+            outfile.write(self.__rawdata)
+        os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
+        self.__rawdata = ""
+        
     def create_filename(self, keep_file_names):
         __base = self.__filename
         __extension = ""
@@ -182,7 +176,7 @@ class Attachment(object):
             __extension = self.__filename.split('.')[-1]
             __base = self.__filename.rstrip('.' + __extension)
         else:
-            """Create an extension if no original filename found."""
+            # Create an extension if no original filename found.
             __extension = mimetypes.guess_extension(self.__mime, False)[1:]
             if __extension == "jpe":
                 __extension = "jpg"
@@ -191,24 +185,28 @@ class Attachment(object):
             # Limit filename length to 100 characters
             self.__filename = __base[:100] + '.' + __extension
         else:
+            # Create a filename from created date if none found or unwanted
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension
         
+        # Remove spaces from filenames since markdown links won't work with spaces
         self.__filename = self.__filename.replace(" ", "_")
+        
+        # Try the filename and if a file with the same name exists add a counter to the end
         self.__filename = checkForDouble(self.__path + self.__MEDIA_PATH,  self.__filename)    
+        
+    def create_hash(self):
+        md5 = hashlib.md5()
+        md5.update(self.__rawdata)
+        self.__hash = binascii.hexlify(md5.digest()).decode()
 
     def finalize(self, keep_file_names):
         self.create_filename(keep_file_names)
         self.decodeBase64()
-        __path = makeDirCheck(self.__path + self.__MEDIA_PATH) + self.__filename
-        with open(__path,'wb') as outfile:
-            outfile.write(self.__rawdata)
-        md5 = hashlib.md5()
-        md5.update(self.__rawdata)
-        self.__hash = binascii.hexlify(md5.digest()).decode()
-        os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
-        self.__rawdata = ""
+        self.create_hash()
+        self.create_file()
         
     def get_attributes(self):
+        # Create a string of markdown code neatly formatted for all attributes
         export = "\n[%s](%s%s)" % (self.__filename, self.__MEDIA_PATH, self.__filename)
         if len(self.__attributes) > 0:
             export += "\n>hash: %s  " % (self.__hash)
@@ -234,7 +232,7 @@ class Attachment(object):
         self.__base64data += dataline.rstrip('\n')
     
     def decodeBase64(self):
-        ''' Decode base64 to memory '''
+        # Decode base64 image to memory
         try:
             self.__rawdata = base64.b64decode(self.__base64data)
             self.__base64data = ""

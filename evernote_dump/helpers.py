@@ -112,5 +112,3 @@ def multiChoice(inTuple):
 
         if result >= 0 and result < len(inTuple):
             return result
-
-
