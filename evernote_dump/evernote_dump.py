@@ -38,6 +38,8 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment.set_path(current_file)
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
+            # UUID ADD
+            self.attachment.set_uuid(self.note.get_uuid())
         elif tag == "note-attributes":
             self.in_note_attributes = True
         elif tag == "resource-attributes":

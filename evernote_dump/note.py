@@ -5,6 +5,7 @@ from helpers import *
 from datetime import datetime
 import re # Regex module for extracting note attachments
 import html2text # Convert html notes to markdown
+import uuid
 
 ################
 ## Note Class ##
@@ -28,6 +29,7 @@ class Note(object):
         # Created
         self.__filename = ""
         self.__markdown = ""
+        self.__uuid = uuid.uuid4()
 
     def add_attachment(self, attachment):
         self.__attachments.append(attachment)
@@ -110,6 +112,12 @@ class Note(object):
     def finalize(self):
         self.create_markdown()
 
+        #PROVE UUID
+        print("Note UUID: " + str(self.__uuid))
+        for atta in self.__attachments:
+            print("Attachments UUID: " + str(atta.get_uuid()))
+        
+
     def get_created_date(self):
         return self.__created_date
     
@@ -118,6 +126,9 @@ class Note(object):
 
     def get_title(self):
         return self.__title
+    
+    def get_uuid(self):
+        return self.__uuid
 
     def new_attachment(self, filename):
         self.__attachments.append(Attachment(filename))
@@ -227,6 +238,9 @@ class Attachment(object):
     
     def get_hash(self):
         return self.__hash
+    
+    def get_uuid(self):
+        return self.__uuid
 
     def data_stream_in(self, dataline):
         self.__base64data.append(dataline.rstrip('\n'))
@@ -250,3 +264,6 @@ class Attachment(object):
     
     def set_path(self, path):
         self.__path = path
+        
+    def set_uuid(self, uuid):
+        self.__uuid = uuid
