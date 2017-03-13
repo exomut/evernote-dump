@@ -152,7 +152,7 @@ class Attachment(object):
         self.__created_date = datetime.now()
         self.__filename = ""
         self.__mime = ""
-        self.__base64data = ""
+        self.__base64data = []
         self.__rawdata = ""
         self.__attributes = []
         self.__path = ""
@@ -229,13 +229,13 @@ class Attachment(object):
         return self.__hash
 
     def data_stream_in(self, dataline):
-        self.__base64data += dataline.rstrip('\n')
+        self.__base64data.append(dataline.rstrip('\n'))
     
     def decodeBase64(self):
         # Decode base64 image to memory
         try:
-            self.__rawdata = base64.b64decode(self.__base64data)
-            self.__base64data = ""
+            self.__rawdata = base64.b64decode(''.join(self.__base64data))
+            self.__base64data = []
         except TypeError:
             raise SystemExit
 
