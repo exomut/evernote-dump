@@ -37,7 +37,7 @@ All the files found in the enex files will be put in the folder
 - [x] Keep the modified dates.
 - [x] Keep file names if desired.
 - [x] Make multilingual just for fun.
-    - [ ] Add multilingual to processing text.
+    - [x] Add multilingual to processing text.
 - [x] Export actual notes.
   - [x] Add links to the images that were extracted.
   - [x] Add resourse attributes.

@@ -53,13 +53,13 @@ def isYesNo(phrase):
             return True
         elif result.lower() == 'no' or result.lower() == 'n':
             return False
-        print(lang('Please answer with "y" or "n" only.'))
+        print(lang('_y_or_n_please'))
 
 def lang(phrase):
         if phrase in translation[selang]:
             return translation[selang][phrase]
         else:
-            return 'needs_translation_entry'
+            return phrase + " (NEEDS TRANSLATION)"
 
 def chooseLanguage():
     global selang
@@ -73,9 +73,15 @@ def chooseLanguage():
 
     while True:
         if sys.version_info[:2] <= (2, 7):
-            result = int(raw_input(phrase))
+            try:
+                result = int(raw_input(phrase))
+            except:
+                result = -1
         else:
-            result = int(input(phrase))
+            try:
+                result = int(input(phrase))
+            except:
+                result = -1
             
         if result <= len(languages) and result > 0:
             selang = languages[result -1] 

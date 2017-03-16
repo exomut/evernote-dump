@@ -8,7 +8,7 @@
 import sys
 import xml.sax # Steaming XML data for use with larger files
 from note import Note, Attachment
-from helpers import isYesNo, chooseLanguage
+from helpers import isYesNo, chooseLanguage, lang
 
 ############################
 ## Note Handler Functions ##
@@ -29,7 +29,7 @@ class NoteHandler( xml.sax.ContentHandler ):
         '''
         self.CurrentData = tag
         if tag == "en-export": # First tag found in .enex file
-            print("\n####EXPORT STARTED####")
+            print("\n####%s####" % (lang("_export_started")))
         elif tag == "note": # New note found
             self.note = Note()
             self.note.set_path(current_file)
@@ -48,24 +48,23 @@ class NoteHandler( xml.sax.ContentHandler ):
     #########################
     def endElement(self, tag):
         if tag == "title":
-            print("\nProcessing note: " + self.note.get_title())
+            print("\n%s: %s" % ( lang('_note_processing'), self.note.get_title()))
         elif tag == "content":
             pass
         elif tag == "resource":
+            print("---%s: %s" % (lang('_exporting_attachment'), self.attachment.get_filename()))
             self.attachment.finalize(keep_file_names)
             self.in_resource_attributes = False
-            print("---Exported attachment: " + self.attachment.get_filename())
         elif tag == "data":
             self.note.add_attachment(self.attachment)
         elif tag == "note": # Last tag called before starting a new note
             #TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
-            print("---Exporting note: " + self.note.get_filename())
-            print("Finalizing note...")    
+            print("---%s: %s" % (lang('_exporting_note'), self.note.get_filename()))
             self.note.finalize()
         elif tag == "note-attributes":
             self.in_note_attributes = False
         elif tag == "en-export": #Last tag closed in the whole .enex file
-            print("\n####EXPORT COMPLETE####\n")
+            print("\n####%s####\n" % (lang('_export_finished')))
 
     #########################
     ## CONTENT STREAM READ ##
@@ -97,7 +96,7 @@ if ( __name__ == "__main__"):
 
     #INIT Request user input
     chooseLanguage()
-    keep_file_names = isYesNo('Would you like to keep the original filenames if found?')
+    keep_file_names = isYesNo('_keep_file_names_q')
 
     # create an XMLReader
     parser = xml.sax.make_parser()
