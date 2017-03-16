@@ -28,7 +28,7 @@ def checkForDouble(path, filename):
         doubleCounter += 1
     return tempFileName
 
-def isPython3():
+def isPythonThree():
     if sys.version_info[:2] <= (2, 7):
         return False 
     else:
@@ -44,7 +44,7 @@ def isYesNo(phrase):
     returns: True for yes, False for no
     '''
     while True:
-        if isPython3():
+        if isPythonThree():
             result = str(input(lang(phrase) + '[y/n] '))
         else:
             result = str(raw_input(lang(phrase) + '[y/n] '))

@@ -8,7 +8,7 @@
 import sys
 import xml.sax # Steaming XML data for use with larger files
 from note import Note, Attachment
-from helpers import isYesNo, chooseLanguage, lang
+from helpers import isYesNo, chooseLanguage, lang, isPythonThree
 
 ############################
 ## Note Handler Functions ##
@@ -93,6 +93,10 @@ class NoteHandler( xml.sax.ContentHandler ):
             self.attachment.add_found_attribute(self.CurrentData, content_stream)
 
 if ( __name__ == "__main__"):
+    
+    if not isPythonThree():
+        print("Please use Python version 3")
+        sys.exit()
 
     #INIT Request user input
     chooseLanguage()
