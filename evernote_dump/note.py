@@ -119,12 +119,6 @@ class Note(object):
     def finalize(self):
         self.create_markdown()
 
-        #PROVE UUID
-        print("Note UUID: " + str(self.__uuid))
-        for atta in self.__attachments:
-            print("Attachments UUID: " + str(atta.get_uuid()))
-        
-
     def get_created_date(self):
         return self.__created_date
     
