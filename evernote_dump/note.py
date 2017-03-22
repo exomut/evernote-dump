@@ -58,6 +58,13 @@ class Note(object):
             #self.__html = self.__html.replace(matches[i], '\n' + if_image + '[noteattachment' + str(i) + '][' + _hash[0] + ']')
             placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
             self.__html = self.__html.replace(matches[i], placeholder)
+            
+        # Handle Checkboxes
+        self.__html = self.__html.replace('<en-todo checked="false"/>', ' [ ] ')
+        self.__html = self.__html.replace('<en-todo checked="false"></en-todo>', ' [ ] ')
+        self.__html = self.__html.replace('<en-todo checked="true"/>', ' [x] ')
+        self.__html = self.__html.replace('<en-todo checked="true"></en-todo>', ' [x] ')
+            
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         
