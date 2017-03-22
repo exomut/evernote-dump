@@ -70,7 +70,7 @@ class Note(object):
         os.utime(self.__path, (self.__created_date.timestamp(), self.__updated_date.timestamp()))
 
     def create_filename(self):
-        self.__filename = checkForDouble(makeDirCheck(self.__path),  self.__title[:100] + ".md")    
+        self.__filename = checkForDouble(makeDirCheck(self.__path),  urlSafeString(self.__title[:30]) + ".md")    
     
     def create_markdown(self):
         self.clean_html()
@@ -182,8 +182,8 @@ class Attachment(object):
                 __extension = "jpg"
 
         if keep_file_names and __base:
-            # Limit filename length to 100 characters
-            self.__filename = __base[:100] + '.' + __extension
+            # Limit filename length to 30 characters
+            self.__filename = urlSafeString(__base[:30]) + '.' + __extension
         else:
             # Create a filename from created date if none found or unwanted
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension

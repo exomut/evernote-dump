@@ -118,3 +118,8 @@ def multiChoice(inTuple):
 
         if result >= 0 and result < len(inTuple):
             return result
+
+def urlSafeString(text):
+    for c in r'[]/\;,><&*:%=+@!#^()|?^':
+        text = text.replace(c,'')
+    return text
