@@ -49,27 +49,34 @@ class Note(object):
         
     def clean_html(self):
         # Cleans self.__html and prepares it for markdown conversion.
-        # Find all attachment links in notes
-        matches = re.findall(r'<en-media[^>]*\/>', self.__html)
-        # Replace all attachments links with a placeholder
-        for i in range(len(matches)):
-            _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
-            if_image = ""
-            if "image" in matches[i]: if_image = "!"
+        self.convert_evernote_markings()
 
-            #self.__html = self.__html.replace(matches[i], '\n' + if_image + '[noteattachment' + str(i) + '][' + _hash[0] + ']')
-            placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
-            self.__html = self.__html.replace(matches[i], placeholder)
-            
-        # Handle Checkboxes
-        self.__html = self.__html.replace('<en-todo checked="false"/>', ' [ ] ')
-        self.__html = self.__html.replace('<en-todo checked="false"></en-todo>', ' [ ] ')
-        self.__html = self.__html.replace('<en-todo checked="true"/>', ' [x] ')
-        self.__html = self.__html.replace('<en-todo checked="true"></en-todo>', ' [x] ')
-            
         # Insert a title to be parsed in markdown
         self.__html = ("<h1>" + self.__title + "</h1>" + self.__html).encode('utf-8') 
         
+    def convert_evernote_markings(self):
+        self.convert_evernote_markings_attachments()
+        replacements = (
+            # Handle Checkboxes
+            ('<en-todo checked="false"/>', ' [ ] '),
+            ('<en-todo checked="false">', ' [ ] '),
+            ('<en-todo checked="true"/>', ' [x] '),
+            ('<en-todo checked="true">', ' [x] '),
+            ('</en-todo>', '')
+        )
+        for take, give in replacements:
+            self.__html = self.__html.replace(take, give)
+        
+    def convert_evernote_markings_attachments(self):
+        # Find all attachment links in notes
+        matches = re.findall(r'<en-media[^>]*\/>', self.__html)
+        # Replace all attachments links with a hash placeholder
+        for i in range(len(matches)):
+            _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
+            if_image = "!" if "image" in matches[i] else "!"
+            placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
+            self.__html = self.__html.replace(matches[i], placeholder)
+
     def convert_html_to_markdown(self):
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         
