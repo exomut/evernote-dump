@@ -1,19 +1,21 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from helpers import *
+from evernote_dump.helpers import *
 from datetime import datetime
-import re # Regex module for extracting note attachments
-import html2text # Convert html notes to markdown
+import re  # Regex module for extracting note attachments
+import html2text  # Convert html notes to markdown
 import uuid
 
-################
-## Note Class ##
-################
+
+##############
+# Note Class #
+##############
 class Note(object):
     __MEDIA_PATH = "media/"
     __ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     __TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
     def __init__(self):
         self.html2text = html2text.HTML2Text()
         # Extracted
@@ -86,7 +88,7 @@ class Note(object):
         os.utime(self.__path, (self.__created_date.timestamp(), self.__updated_date.timestamp()))
 
     def create_filename(self):
-        self.__filename = checkForDouble(makeDirCheck(self.__path),  urlSafeString(self.__title[:30]) + ".md")    
+        self.__filename = check_for_double(make_dir_check(self.__path),  url_safe_string(self.__title[:30]) + ".md")
     
     def create_markdown(self):
         self.clean_html()
@@ -154,18 +156,20 @@ class Note(object):
         self.__title = title
         self.create_filename()
         
-######################
-## ATTACHMENT CLASS ##
-######################
+####################
+# ATTACHMENT CLASS #
+####################
 
-import base64 # Decodes base64
-import mimetypes # Converts mime file types into an extension
-import hashlib # Used to get md5 hash from attachments
-import binascii # Used to convert hash output to string
+import base64  # Decodes base64
+import mimetypes  # Converts mime file types into an extension
+import hashlib  # Used to get md5 hash from attachments
+import binascii  # Used to convert hash output to string
+
 
 class Attachment(object):
     __MEDIA_PATH = "media/"
     __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
+
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
         self.__created_date = datetime.now()
@@ -181,7 +185,7 @@ class Attachment(object):
 
     def create_file(self):
         # Create the file and set the original timestamps
-        __path = makeDirCheck(self.__path + self.__MEDIA_PATH) + self.__filename
+        __path = make_dir_check(self.__path + self.__MEDIA_PATH) + self.__filename
         with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
         os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
@@ -189,7 +193,6 @@ class Attachment(object):
         
     def create_filename(self, keep_file_names):
         __base = self.__filename
-        __extension = ""
 
         if self.__filename.count('.') >= 1:
             __extension = self.__filename.split('.')[-1]
@@ -202,7 +205,7 @@ class Attachment(object):
 
         if keep_file_names and __base:
             # Limit filename length to 30 characters
-            self.__filename = urlSafeString(__base[:30]) + '.' + __extension
+            self.__filename = url_safe_string(__base[:30]) + '.' + __extension
         else:
             # Create a filename from created date if none found or unwanted
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension
@@ -211,7 +214,7 @@ class Attachment(object):
         self.__filename = self.__filename.replace(" ", "_")
         
         # Try the filename and if a file with the same name exists add a counter to the end
-        self.__filename = checkForDouble(self.__path + self.__MEDIA_PATH,  self.__filename)    
+        self.__filename = check_for_double(self.__path + self.__MEDIA_PATH,  self.__filename)
         
     def create_hash(self):
         md5 = hashlib.md5()
