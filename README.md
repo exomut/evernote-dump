@@ -16,15 +16,15 @@ Before running the evernote_dump.py script be sure to install.
 
 Run using python3:
 
-> python evernote_dump.py FILE.enex  
+> python run_script.py FILE.enex  
 
 or for exporting all enex files in a folder, use:  
 
-> python evernote_dump.py *  
+> python run_script.py *  
 
 it will weed out all other non-enex files. If your system is setup to default to python 2 run using:
 
-> python3 evernote_dump.py FILE.enex
+> python3 run_script.py FILE.enex
 
 All attachments found will be output the the "ENEX-FILE-NAME-ROOT/media" folder as where you called evernote_dump.py .
 

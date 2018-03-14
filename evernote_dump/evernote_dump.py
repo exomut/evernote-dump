@@ -7,8 +7,8 @@
 
 import sys
 import xml.sax  # Steaming XML data for use with larger files
-from evernote_dump.note import Note, Attachment
-from evernote_dump.helpers import is_yes_no, choose_language, lang, is_python_three
+from .note import Note, Attachment
+from .helpers import is_yes_no, choose_language, lang, is_python_three
 
 
 ##########################
@@ -109,7 +109,7 @@ def run_parse(args):
     parser.setFeature(xml.sax.handler.feature_namespaces, 0)
 
     # override the default ContextHandler
-    for i in range(1, len(args)):
+    for i in range(0, len(args)):
         # pass in first argument as input file.
         if ".enex" in args[i]:
             current_file = args[i].replace(".enex", "/")
@@ -121,14 +121,15 @@ def run_parse(args):
             #     print(args[i] + " was unable to be parsed correctly.")
 
 
-if __name__ == "__main__":
-    
+def main(args):
+
     if not is_python_three():
         print("Please use Python version 3")
         sys.exit()
 
     # INIT Request user input
     choose_language()
+    global keep_file_names
     keep_file_names = is_yes_no('_keep_file_names_q')
 
-    run_parse(sys.argv)
+    run_parse(args)
