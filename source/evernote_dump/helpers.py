@@ -19,7 +19,7 @@ def check_for_double(path, filename):
     """
     doubleCounter = 2
     tempFileName = filename
-    while os.path.exists(path + tempFileName):
+    while os.path.exists(os.path.join(path, tempFileName)):
         if len(filename.rsplit('.', 1)) > 1:
             tempFileName = filename.rsplit('.', 1)[0] + \
                            '-' + str(doubleCounter) + '.' + \

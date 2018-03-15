@@ -6,10 +6,14 @@
 ###########
 
 import sys
+import os
 import xml.sax  # Steaming XML data for use with larger files
 from .note import Note, Attachment
 from .helpers import is_yes_no, choose_language, lang, is_python_three
 
+
+global keep_file_names
+keep_file_names = True
 
 ##########################
 # Note Handler Functions #
@@ -17,14 +21,16 @@ from .helpers import is_yes_no, choose_language, lang, is_python_three
 
 
 class NoteHandler(xml.sax.ContentHandler):
-    def __init__(self, current_file):
+    def __init__(self, current_file, path=""):
         super(NoteHandler, self).__init__()
         self.current_file = current_file
+
         self.CurrentData = ""
         self.in_note_attributes = False
         self.in_resource_attributes = False
         self.note = None
         self.attachment = None
+        self.path = path
 
     ######################
     # ELEMENT READ START #
@@ -36,10 +42,10 @@ class NoteHandler(xml.sax.ContentHandler):
             print("\n####%s####" % (lang("_export_started")))
         elif tag == "note":  # New note found
             self.note = Note()
-            self.note.set_path(self.current_file)
+            self.note.set_path(os.path.join(self.path, self.current_file))
         elif tag == "data":  # Found an attachment
             self.attachment = Attachment()
-            self.attachment.set_path(self.current_file)
+            self.attachment.set_path(os.path.join(self.path, self.current_file))
             self.attachment.set_created_date(self.note.get_created_date())
             self.attachment.set_filename(self.note.get_title())
             self.attachment.set_uuid(self.note.get_uuid())
@@ -101,7 +107,7 @@ class NoteHandler(xml.sax.ContentHandler):
             self.attachment.add_found_attribute(self.CurrentData, content_stream)
 
 
-def run_parse(args):
+def run_parse(args, path=""):
     # create an XMLReader
     parser = xml.sax.make_parser()
 
@@ -112,8 +118,9 @@ def run_parse(args):
     for i in range(0, len(args)):
         # pass in first argument as input file.
         if ".enex" in args[i]:
-            current_file = args[i].replace(".enex", "/")
-            handler = NoteHandler(current_file)
+            base = os.path.basename(args[i])
+            current_file = base.replace(".enex", "")
+            handler = NoteHandler(current_file, path)
             parser.setContentHandler(handler)
             # try:
             parser.parse(args[i])

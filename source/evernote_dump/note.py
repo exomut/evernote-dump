@@ -83,9 +83,9 @@ class Note(object):
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
         
     def create_file(self):
-        with open(self.__path + self.__filename,'w') as outfile:
+        with open(os.path.join(self.__path, self.__filename),'w') as outfile:
             outfile.write(self.__markdown)
-        os.utime(self.__path, (self.__created_date.timestamp(), self.__updated_date.timestamp()))
+        os.utime(os.path.join(self.__path, self.__filename), (self.__created_date.timestamp(), self.__updated_date.timestamp()))
 
     def create_filename(self):
         self.__filename = check_for_double(make_dir_check(self.__path),  url_safe_string(self.__title[:30]) + ".md")
@@ -185,7 +185,7 @@ class Attachment(object):
 
     def create_file(self):
         # Create the file and set the original timestamps
-        __path = make_dir_check(self.__path + self.__MEDIA_PATH) + self.__filename
+        __path = os.path.join(make_dir_check(os.path.join(self.__path, self.__MEDIA_PATH)), self.__filename)
         with open(__path,'wb') as outfile:
             outfile.write(self.__rawdata)
         os.utime(__path, (self.__created_date.timestamp(), self.__created_date.timestamp()))
@@ -214,7 +214,7 @@ class Attachment(object):
         self.__filename = self.__filename.replace(" ", "_")
         
         # Try the filename and if a file with the same name exists add a counter to the end
-        self.__filename = check_for_double(self.__path + self.__MEDIA_PATH,  self.__filename)
+        self.__filename = check_for_double(os.path.join(self.__path, self.__MEDIA_PATH),  self.__filename)
         
     def create_hash(self):
         md5 = hashlib.md5()
@@ -222,7 +222,10 @@ class Attachment(object):
         self.__hash = binascii.hexlify(md5.digest()).decode()
 
     def finalize(self, keep_file_names):
-        self.create_filename(keep_file_names)
+        try:
+            self.create_filename(keep_file_names)
+        except NameError:
+            self.create_filename(True)
         self.decodeBase64()
         self.create_hash()
         self.create_file()
