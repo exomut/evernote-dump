@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from evernote_dump.helpers import *
+from source.evernote_dump.helpers import *
 from datetime import datetime
 import re  # Regex module for extracting note attachments
 import html2text  # Convert html notes to markdown

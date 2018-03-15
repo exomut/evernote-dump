@@ -1,7 +1,7 @@
 import unittest
 import os
 import shutil
-from evernote_dump.evernote_dump import run_parse
+from source.evernote_dump.evernote_dump import run_parse
 
 
 class TestEvernoteDump(unittest.TestCase):
