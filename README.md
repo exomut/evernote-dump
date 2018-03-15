@@ -13,8 +13,13 @@ Before running the evernote_dump.py script be sure to install.
 > pip install -r requirements.txt
 
 # Instructions
+## GUI:
+Run using python 3
 
-Run using python3:
+> python main.py
+
+## CLI:
+Run using python 3:
 
 > python run_script.py FILE.enex  
 

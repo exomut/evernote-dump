@@ -27,12 +27,15 @@ class Main(BoxLayout):
         self.write_message("Click 'RUN PARSE' when you are ready.")
 
     def start_parse(self):
-        self.write_message("Parsing has begun. This may take a while depending on .enex file size.")
-        self.write_message("Processing ...")
-        evernote_dump.run_parse(self.__file_list, self.__export_dir)
-        self.write_message("Finished!!")
-        self.write_message("Check the console for more information.")
-        self.write_message("Choose more files or close the app.")
+        if len(self.__file_list) > 0:
+            self.write_message("Parsing has begun. This may take a while depending on .enex file size.")
+            self.write_message("Processing ...")
+            evernote_dump.run_parse(self.__file_list, self.__export_dir)
+            self.write_message("Finished!!")
+            self.write_message("Check the console for more information.")
+            self.write_message("Choose more files or close the app.")
+        else:
+            self.write_message("Please Choose a .enex file.")
 
     def update_export_dir(self, paths):
         self.__export_dir = ''
