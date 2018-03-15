@@ -6,6 +6,10 @@ All notes and attachments will keep their original file created and accessed dat
 
 Evernote Dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
+# Quick Run
+
+Windows: Double click the "Evernote Dump.bat"
+
 # Installation
 
 Before running the evernote_dump.py script be sure to install.
