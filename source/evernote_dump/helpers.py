@@ -3,7 +3,7 @@
 
 import os
 import sys
-from source.evernote_dump.language import translation
+from .language import translation
 
 
 def check_for_double(path, filename):

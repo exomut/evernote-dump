@@ -9,18 +9,22 @@
                 id: enex_file_chooser
                 multiselect: True
                 on_selection: root.update_file_list(enex_file_chooser.selection)
+            TopLabel:
+                id: file_count_label
         BoxLayout:
-            size_hint_x: 2
+            size_hint_x: 1
             orientation: 'vertical'
             ScrollView:
                 Label:
                     id: log_box
+                    text_size: 400, None
                     height: self.texture_size[1]
                     font_size: 18
                     size_hint_y: None
                     markup: True
             Button:
                 id: start_parse
+                text: 'RUN PARSE'
                 height: dp(100)
                 size_hint_y: None
                 on_press: root.start_parse()
@@ -32,10 +36,14 @@
                 id: export_dir_chooser
                 on_selection: root.update_export_dir(export_dir_chooser.selection)
                 dirselect: True
+            TopLabel
+                id: export_path_label
 
 <TopLabel@Label>:
-    height: dp(50)
+    height: dp(30)
     size_hint_y: None
+    text_size: self.size
+    shorten: True
     color: 1, 1, 1, 1
     canvas.before:
         Color:
