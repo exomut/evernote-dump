@@ -58,14 +58,16 @@ class Note(object):
         
     def convert_evernote_markings(self):
         self.convert_evernote_markings_attachments()
+
         replacements = (
             # Handle Checkboxes
-            ('<en-todo checked="false"/>', ' [ ] '),
-            ('<en-todo checked="false">', ' [ ] '),
-            ('<en-todo checked="true"/>', ' [x] '),
-            ('<en-todo checked="true">', ' [x] '),
-            ('</en-todo>', '')
+            ('<en-todo checked="false"/>', '-<ignore> [ ] '),    # without this hack html2text will convert '-' to '\\-' because there is space after dash
+            ('<en-todo checked="false">', '-<ignore> [ ] '),
+            ('<en-todo checked="true"/>', '-<ignore> [x] '),
+            ('<en-todo checked="true">', '-<ignore> [x] '),
+            ('</en-todo>', ''),
         )
+
         for take, give in replacements:
             self.__html = self.__html.replace(take, give)
         
@@ -81,22 +83,22 @@ class Note(object):
 
     def convert_html_to_markdown(self):
         self.__markdown = self.html2text.handle(self.__html.decode('utf-8'))
-        
+		
     def create_file(self):
-        with open(os.path.join(self.__path, self.__filename),'w') as outfile:
+        with open(os.path.join(self.__path, self.__filename), 'w', encoding='UTF-8', errors='replace') as outfile:
             outfile.write(self.__markdown)
         os.utime(os.path.join(self.__path, self.__filename), (self.__created_date.timestamp(), self.__updated_date.timestamp()))
 
     def create_filename(self):
-        self.__filename = check_for_double(make_dir_check(self.__path),  url_safe_string(self.__title[:30]) + ".md")
+        self.__filename = check_for_double(make_dir_check(self.__path),  url_safe_string(self.__title[:128]) + ".md")
     
     def create_markdown(self):
         self.clean_html()
         self.convert_html_to_markdown()
         self.create_markdown_attachments()
-        self.create_markdown_note_attr()
         if len(self.__tags) > 0:
             self.create_markdown_note_tags()
+        self.create_markdown_note_attr()
         self.create_file()
             
     def create_markdown_attachments(self):
@@ -120,10 +122,9 @@ class Note(object):
     def create_markdown_note_tags(self):
         self.__markdown += "\n\n---"
         self.__markdown += "\n### TAGS\n"
-        tags = ""
-        for tag in self.__tags:
-            tags += tag + ","
-        self.__markdown += tags[:-1]
+        tags = '  '.join(['{%s}' % tag for tag in self.__tags])
+		tags += "\n"
+        self.__markdown += tags
 
     def finalize(self):
         self.create_markdown()
@@ -204,8 +205,8 @@ class Attachment(object):
                 __extension = "jpg"
 
         if keep_file_names and __base:
-            # Limit filename length to 30 characters
-            self.__filename = url_safe_string(__base[:30]) + '.' + __extension
+            # Limit filename length to 128 characters
+            self.__filename = url_safe_string(__base[:128]) + '.' + __extension
         else:
             # Create a filename from created date if none found or unwanted
             self.__filename = self.__created_date.strftime(self.__TIME_FORMAT) + '.' + __extension

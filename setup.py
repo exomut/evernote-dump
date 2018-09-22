@@ -1,7 +1,7 @@
 from setuptools import setup
 
 # TODO Write README
-with open('README', 'r') as f:
+with open('README.md', 'r') as f:
     long_description = f.read()
 
 setup(
