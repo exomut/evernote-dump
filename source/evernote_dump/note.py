@@ -90,6 +90,9 @@ class Note(object):
         os.utime(os.path.join(self.__path, self.__filename), (self.__created_date.timestamp(), self.__updated_date.timestamp()))
 
     def create_filename(self):
+        # make sure title can be converted to filename
+        if any(char.isalpha() or char.isdigit() for char in self.__title) == False:
+          self.__title = "_" + str(self.__uuid)
         self.__filename = check_for_double(make_dir_check(self.__path),  url_safe_string(self.__title[:128]) + ".md")
     
     def create_markdown(self):
@@ -123,7 +126,7 @@ class Note(object):
         self.__markdown += "\n\n---"
         self.__markdown += "\n### TAGS\n"
         tags = '  '.join(['{%s}' % tag for tag in self.__tags])
-		tags += "\n"
+        tags += "\n"
         self.__markdown += tags
 
     def finalize(self):
