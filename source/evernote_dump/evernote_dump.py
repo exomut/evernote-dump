@@ -43,7 +43,7 @@ class NoteHandler(xml.sax.ContentHandler):
         elif tag == "note":  # New note found
             self.note = Note()
             self.note.set_path(os.path.join(self.path, self.current_file))
-        elif tag == "data":  # Found an attachment
+        elif tag == "resource":  # Found an attachment
             self.attachment = Attachment()
             self.attachment.set_path(os.path.join(self.path, self.current_file))
             self.attachment.set_created_date(self.note.get_created_date())
