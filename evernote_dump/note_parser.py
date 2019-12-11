@@ -1,28 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-###########
-# IMPORTS #
-###########
-
-import sys
 import os
-import xml.sax  # Steaming XML data for use with larger files
+import xml.sax
+
 from .note import Note, Attachment
-from .helpers import is_yes_no, choose_language, lang, is_python_three
+from .tool_kit import lang
 
 
-global keep_file_names
-keep_file_names = True
-
-##########################
-# Note Handler Functions #
-##########################
-
-
-class NoteHandler(xml.sax.ContentHandler):
+class NoteParser(xml.sax.ContentHandler):
     def __init__(self, current_file, path=""):
-        super(NoteHandler, self).__init__()
+        super().__init__()
         self.current_file = current_file
 
         self.CurrentData = ""
@@ -53,13 +38,13 @@ class NoteHandler(xml.sax.ContentHandler):
             self.in_note_attributes = True
         elif tag == "resource-attributes":
             self.in_resource_attributes = True
-    
+
     #######################
     # ELEMENT READ FINISH #
     #######################
     def endElement(self, tag):
         if tag == "title":
-            print("\n%s: %s" % ( lang('_note_processing'), self.note.get_title()))
+            print("\n%s: %s" % (lang('_note_processing'), self.note.get_title()))
         elif tag == "content":
             pass
         elif tag == "resource":
@@ -71,8 +56,7 @@ class NoteHandler(xml.sax.ContentHandler):
             self.in_resource_attributes = False
         elif tag == "data":
             self.note.add_attachment(self.attachment)
-        elif tag == "note": # Last tag called before starting a new note
-            # TODO ask user if they want to use qownnotes style. i.e. make attachment links "file://media/aldskfj.png"
+        elif tag == "note":  # Last tag called before starting a new note
             print("---%s: %s" % (lang('_exporting_note'), self.note.get_filename()))
             self.note.finalize()
         elif tag == "note-attributes":
@@ -100,43 +84,9 @@ class NoteHandler(xml.sax.ContentHandler):
             self.attachment.set_mime(content_stream)
         elif self.CurrentData == "file-name":
             self.attachment.set_filename(content_stream)
-        
+
         if self.in_note_attributes:
             self.note.add_found_attribute(self.CurrentData, content_stream)
         if self.in_resource_attributes:
             self.attachment.add_found_attribute(self.CurrentData, content_stream)
 
-
-def run_parse(args, path=""):
-    # create an XMLReader
-    parser = xml.sax.make_parser()
-
-    # turn off namespaces
-    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-
-    # override the default ContextHandler
-    for i in range(0, len(args)):
-        # pass in first argument as input file.
-        if ".enex" in args[i]:
-            base = os.path.basename(args[i])
-            current_file = base.replace(".enex", "")
-            handler = NoteHandler(current_file, path)
-            parser.setContentHandler(handler)
-            # try:
-            parser.parse(args[i])
-            # except Exception:
-            #     print(args[i] + " was unable to be parsed correctly.")
-
-
-def main(args):
-
-    if not is_python_three():
-        print("Please use Python version 3")
-        sys.exit()
-
-    # INIT Request user input
-    choose_language()
-    global keep_file_names
-    keep_file_names = is_yes_no('_keep_file_names_q')
-
-    run_parse(args)

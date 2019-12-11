@@ -17,24 +17,17 @@ def check_for_double(path, filename):
 
     returns: an updated path if path double found
     """
-    doubleCounter = 2
-    tempFileName = filename
-    while os.path.exists(os.path.join(path, tempFileName)):
+    double_counter = 2
+    temp_file_name = filename
+    while os.path.exists(os.path.join(path, temp_file_name)):
         if len(filename.rsplit('.', 1)) > 1:
-            tempFileName = filename.rsplit('.', 1)[0] + \
-                           '-' + str(doubleCounter) + '.' + \
+            temp_file_name = filename.rsplit('.', 1)[0] + \
+                           '-' + str(double_counter) + '.' + \
                            filename.rsplit('.', 1)[1]
         else:
-            tempFileName += '-' + str(doubleCounter)
-        doubleCounter += 1
-    return tempFileName
-
-
-def is_python_three():
-    if sys.version_info[:2] <= (2, 7):
-        return False
-    else:
-        return True
+            temp_file_name += '-' + str(double_counter)
+        double_counter += 1
+    return temp_file_name
 
 
 def is_yes_no(phrase):
@@ -47,10 +40,7 @@ def is_yes_no(phrase):
     returns: True for yes, False for no
     """
     while True:
-        if is_python_three():
-            result = str(input(lang(phrase) + '[y/n] '))
-        else:
-            result = str(raw_input(lang(phrase) + '[y/n] '))
+        result = str(input(lang(phrase) + '[y/n] '))
 
         if result.lower() == 'yes' or result.lower() == 'y':
             return True
@@ -111,22 +101,22 @@ def make_dir_check(path):
     return path
 
 
-def multi_choice(inTuple):
+def multi_choice(choices: tuple) -> int:
     """
-    # Input a Tuple of choices.
-    # Returns the user's choice as tuple entry
+    Prints the choices to console including a number for choosing.
+
+    :param choices: tuple Strings for user to make a choice
+    :return: Returns the index value for the choice
+    :rtype: int
     """
     phrase = ''
-    for i in range(len(inTuple)):
-        phrase += inTuple[i] + '[' + str(i + 1) + '] '
+    for i in range(len(choices)):
+        phrase += choices[i] + '[' + str(i + 1) + '] '
 
     while True:
-        if sys.version_info[:2] <= (2, 7):
-            result = int(raw_input(phrase))
-        else:
-            result = int(input(phrase))
+        result = int(input(phrase))
 
-        if 0 <= result < len(inTuple):
+        if 0 <= result < len(choices):
             return result
 
 
