@@ -1,61 +1,47 @@
 # Evernote Dump
 
-Export extract evernote notes and attachments from .enex files.
+**Evernote Dump** exports and extracts evernote notes and attachments from .enex files.
 
 All notes and attachments will keep their original file created and accessed dates. Notes will be converted to markdown format. Tags and other embedded information will be formatted and added to the end of each note.
 
 Evernote Dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
-# Quick Run
+## Requirements 
+
+```
+pip install -r requirements.txt
+```
+
+## Running: GUI:
 
 Windows: Double click the "Evernote Dump.bat"
+```
+python main.py
+```
 
-# Installation
+#### **Warning**: Python 3.8.0
 
-Before running the evernote_dump.py script be sure to install.
+At the time of writing this, running the _requirement.txt_ file will result in an error due to Kivy not being update yet. Please run the following command to as a work around. If you are not using the GUI interface this is not needed.
 
-> pip install -r requirements.txt
+```
+pip install kivy[base] kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/
+```
 
-# Instructions
-## GUI:
-Run using python 3
+## Running: Command Line:
 
-> python main.py
-
-## CLI:
-Run using python 3:
-
-> python run_script.py FILE.enex  
+```
+python run_script.py FILE.enex  
+```
 
 or for exporting all enex files in a folder, use:  
 
-> python run_script.py *  
-
-it will weed out all other non-enex files. If your system is setup to default to python 2 run using:
-
-> python3 run_script.py FILE.enex
+```
+python run_script.py *  
+```
 
 All attachments found will be output the the "ENEX-FILE-NAME-ROOT/media" folder as where you called evernote_dump.py .
 
 All the files found in the enex files will be put in the folder
-
-# TODO
-
-- [x] Export Note Attributes
-    - [x] Export Tags
-- [x] Allow multiple files and export to seperate folders.
-- [x] Export all attachements.
-- [x] Keep the modified dates.
-- [x] Keep file names if desired.
-- [x] Make multilingual just for fun.
-    - [x] Add multilingual to processing text.
-- [x] Export actual notes.
-  - [x] Add links to the images that were extracted.
-  - [x] Add resourse attributes.
-- [x] Convert notes to mark down.
-- [x] Add more error check to combat human errors
-- [x] Get rid of cleanup warning.
-- [x] Clean up the code!
 
 # Evernote Enex File Map
 
