@@ -1,11 +1,12 @@
 import os
-import xml.sax
+from xml.sax import ContentHandler
 
-from .note import Note, Attachment
-from .tool_kit import lang
+from note import Note, Attachment
+from tool_kit import lang
 
 
-class NoteParser(xml.sax.ContentHandler):
+class NoteParser(ContentHandler):
+
     def __init__(self, current_file, path=""):
         super().__init__()
         self.current_file = current_file

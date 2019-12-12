@@ -1,21 +1,22 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import os
 import sys
-from .language import translation
+
+from language import translation
 
 
-def check_for_double(path, filename):
+def check_for_double(path: str, filename: str) -> str:
     """
-    # Make sure the path has a trailing /
-    # Check file path and modifies it if a duplicate is found.
-    # Used for creating new files.
-    # Works with file extensions too.
+    Searches a directory for files with the desired filename.
+    If a match is found a new filename will be created with a numbers system.
+    Useful to prevent over-writing files.
 
-    path: to desired save point
+    :param path: str Path to directory where the new file will be created.
+    :param filename: str Filename to check for duplicates.
 
-    returns: an updated path if path double found
+    :return: Returns an updated filename with an ascending number if duplicates found.
+    :rtype: str
     """
     double_counter = 2
     temp_file_name = filename
@@ -39,6 +40,7 @@ def is_yes_no(phrase):
 
     returns: True for yes, False for no
     """
+    # TODO: Remove language checking from here to better location
     while True:
         result = str(input(lang(phrase) + '[y/n] '))
 
