@@ -1,14 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os
 from xml.sax import ContentHandler
 
 from note import Note, Attachment
+from settings import Settings
 from tool_kit import lang
 
 
 class NoteParser(ContentHandler):
 
-    def __init__(self, current_file, path=""):
+    def __init__(self, current_file, settings: Settings):
         super().__init__()
+
         self.current_file = current_file
 
         self.CurrentData = ""
@@ -16,7 +20,7 @@ class NoteParser(ContentHandler):
         self.in_resource_attributes = False
         self.note = None
         self.attachment = None
-        self.path = path
+        self.path = settings.export_path
 
     ######################
     # ELEMENT READ START #
