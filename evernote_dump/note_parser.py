@@ -5,7 +5,7 @@ from xml.sax import ContentHandler
 
 from note import Note, Attachment
 from settings import Settings
-from tool_kit import lang
+from utilities.tool_kit import lang
 
 
 class NoteParser(ContentHandler):
