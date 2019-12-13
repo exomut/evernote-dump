@@ -3,15 +3,15 @@
 import os
 from xml.sax import ContentHandler
 
-from note import Note, Attachment
-from settings import Settings
-from utilities.tool_kit import lang
+from utilities.settings import Settings
+from .note import Note, Attachment
 
 
 class NoteParser(ContentHandler):
 
     def __init__(self, current_file, settings: Settings):
         super().__init__()
+        self.settings = settings
 
         self.current_file = current_file
 
@@ -29,7 +29,7 @@ class NoteParser(ContentHandler):
         """ Called when a new element is found """
         self.CurrentData = tag
         if tag == "en-export":  # First tag found in .enex file
-            print("\n####%s####" % (lang("_export_started")))
+            print("\n####EXPORT STARTED####")
         elif tag == "note":  # New note found
             self.note = Note()
             self.note.set_path(os.path.join(self.path, self.current_file))
@@ -49,25 +49,25 @@ class NoteParser(ContentHandler):
     #######################
     def endElement(self, tag):
         if tag == "title":
-            print("\n%s: %s" % (lang('_note_processing'), self.note.get_title()))
+            print(f"\nProcessing Note: {self.note.get_title()}")
         elif tag == "content":
             pass
         elif tag == "resource":
-            print("---%s: %s" % (lang('_exporting_attachment'), self.attachment.get_filename()))
+            print(f"---Exporting Attachment: {self.attachment.get_filename()}")
             try:
-                self.attachment.finalize(keep_file_names)
+                self.attachment.finalize(self.settings.preserve_file_names)
             except NameError:
                 self.attachment.finalize(True)
             self.in_resource_attributes = False
         elif tag == "data":
             self.note.add_attachment(self.attachment)
         elif tag == "note":  # Last tag called before starting a new note
-            print("---%s: %s" % (lang('_exporting_note'), self.note.get_filename()))
+            print(f"---Exporting Note: {self.note.get_filename()}")
             self.note.finalize()
         elif tag == "note-attributes":
             self.in_note_attributes = False
         elif tag == "en-export":  # Last tag closed in the whole .enex file
-            print("\n####%s####\n" % (lang('_export_finished')))
+            print("\n####EXPORT FINISHED####\n")
 
     #######################
     # CONTENT STREAM READ #
@@ -94,4 +94,3 @@ class NoteParser(ContentHandler):
             self.note.add_found_attribute(self.CurrentData, content_stream)
         if self.in_resource_attributes:
             self.attachment.add_found_attribute(self.CurrentData, content_stream)
-

@@ -3,8 +3,6 @@
 import os
 import sys
 
-from language import translation
-
 
 def check_for_double(path: str, filename: str) -> str:
     """
@@ -29,63 +27,6 @@ def check_for_double(path: str, filename: str) -> str:
             temp_file_name += '-' + str(double_counter)
         double_counter += 1
     return temp_file_name
-
-
-def is_yes_no(phrase):
-    """
-    # Ask as yes/no question and have the input check and turned into
-    # a boolean. Compatible with all versions of Python.
-
-    phrase: Yes/No phrase you would like to get input from user for
-
-    returns: True for yes, False for no
-    """
-    # TODO: Remove language checking from here to better location
-    while True:
-        result = str(input(lang(phrase) + '[y/n] '))
-
-        if result.lower() == 'yes' or result.lower() == 'y':
-            return True
-        elif result.lower() == 'no' or result.lower() == 'n':
-            return False
-        print(lang('_y_or_n_please'))
-
-
-def lang(phrase):
-    try:
-        if phrase in translation[selang]:
-            return translation[selang][phrase]
-        else:
-            return phrase + " (NEEDS TRANSLATION)"
-    except (UnboundLocalError, NameError):
-        return translation['English'][phrase]
-
-
-def choose_language():
-    global selang
-    phrase = ''
-    counter = 1
-    languages = []
-    for language in sorted(translation.keys()):
-        phrase += '[' + str(counter) + ']' + language + ' '
-        languages.append(language)
-        counter += 1
-
-    while True:
-        if sys.version_info[:2] <= (2, 7):
-            try:
-                result = int(raw_input(phrase))
-            except Exception:
-                result = -1
-        else:
-            try:
-                result = int(input(phrase))
-            except Exception:
-                result = -1
-
-        if len(languages) >= result > 0:
-            selang = languages[result - 1]
-            break
 
 
 def make_dir_check(path):

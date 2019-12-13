@@ -10,11 +10,11 @@ class Settings:
         self.preserve_file_names = False
 
     @property
-    def path(self, path: str):
+    def path(self):
         return self.export_path
 
     @path.setter
-    def path(self, path:str):
+    def path(self, path: str):
         self.export_path = path
 
     @property

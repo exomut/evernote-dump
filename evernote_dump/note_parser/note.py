@@ -7,7 +7,7 @@ import re  # Regex module for extracting note attachments
 import html2text  # Convert html notes to markdown
 import uuid
 
-from attachment import Attachment
+from note_parser.attachment import Attachment
 
 
 ##############

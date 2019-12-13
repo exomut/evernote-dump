@@ -12,25 +12,18 @@ Evernote Dump works by streaming the .enex file through a parser so even extreme
 pip install -r requirements.txt
 ```
 
-## Running: GUI:
+## Running: Gui
 
-Windows: Double click the "Evernote Dump.bat"
-```
-python main.py
-```
-
-#### **Warning**: Python 3.8.0
-
-At the time of writing this, running the _requirement.txt_ file will result in an error due to Kivy not being update yet. Please run the following command to as a work around. If you are not using the GUI interface this is not needed.
+The GUI is not functional right now. I am transitioning away from Kivy to TKinter.
 
 ```
-pip install kivy[base] kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/
+python evernote_dump.py
 ```
 
 ## Running: Command Line:
 
 ```
-python run_script.py FILE.enex  
+python run_script.py FILE.enex
 ```
 
 or for exporting all enex files in a folder, use:  

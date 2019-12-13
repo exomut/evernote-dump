@@ -1,36 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
 import argparse
-from xml.sax import make_parser, handler
+import sys
 
-from settings import Settings
-from note_parser import NoteParser
-
-settings = Settings()
-
-
-def run_parse():
-    """
-    Start the parsing of an Evernote enex file.
-
-    :args
-
-
-    """
-    # Setup xml parser
-    parser = make_parser()
-    parser.setFeature(handler.feature_namespaces, 0)
-
-    for file in settings.files:
-        base = os.path.basename(file)
-        current_file = base.replace(".enex", "")
-        note_handler = NoteParser(current_file, settings)
-        parser.setContentHandler(note_handler)
-        parser.parse(file)
-
+from gui import EvernoteDumpGui
+from dump import run_parse
+from utilities.settings import Settings
 
 if __name__ == "__main__":
+    settings = Settings()
     arg_parser = argparse.ArgumentParser(prog='Evernote Dump',
                                          description='Evernote Dump exports and extracts evernote notes and '
                                                      'attachments from .enex files. All notes and attachments '
@@ -47,7 +25,9 @@ if __name__ == "__main__":
                             help='Preserve original filenames for attachments.')
     arg_parser.parse_args(namespace=settings)
 
-    print(settings.files)
-    run_parse()
+    if len(sys.argv) == 1:
+        EvernoteDumpGui().mainloop()
+    else:
+        run_parse(settings)
 
 

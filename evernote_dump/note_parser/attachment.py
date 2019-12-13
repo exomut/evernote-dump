@@ -9,8 +9,8 @@ from utilities.tool_kit import check_for_double, make_dir_check, url_safe_string
 
 
 class Attachment(object):
-    __MEDIA_PATH = "media/"
-    __TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
+    MEDIA_PATH = "media/"
+    TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
     def __init__(self):
         """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
@@ -18,22 +18,22 @@ class Attachment(object):
         self._filename = ""
         self._mime = ""
         self._base64data = []
-        self._raw_data = ""
+        self._raw_data = b""
         self._attributes = []
         self._path = ""
         self._hash = ""
         self._uuid = ""
 
-    def add_found_attribute(self, attr, dataline):
-        self._attributes.append([attr, dataline])
+    def add_found_attribute(self, attr, data_line):
+        self._attributes.append([attr, data_line])
 
     def create_file(self):
         # Create the file and set the original timestamps
-        path = os.path.join(make_dir_check(os.path.join(self._path, self.__MEDIA_PATH)), self._filename)
+        path = os.path.join(make_dir_check(os.path.join(self._path, self.MEDIA_PATH)), self._filename)
         with open(path, 'wb') as outfile:
             outfile.write(self._raw_data)
         os.utime(path, (self._created_date.timestamp(), self._created_date.timestamp()))
-        self._raw_data = ""
+        self._raw_data = b""
 
     def create_filename(self, keep_file_names):
         base = self._filename
@@ -52,13 +52,13 @@ class Attachment(object):
             self._filename = url_safe_string(base[:128]) + '.' + extension
         else:
             # Create a filename from created date if none found or unwanted
-            self._filename = self._created_date.strftime(self.__TIME_FORMAT) + '.' + extension
+            self._filename = self._created_date.strftime(self.TIME_FORMAT) + '.' + extension
 
         # Remove spaces from filenames since markdown links won't work with spaces
         self._filename = self._filename.replace(" ", "_")
 
         # Try the filename and if a file with the same name exists add a counter to the end
-        self._filename = check_for_double(os.path.join(self._path, self.__MEDIA_PATH), self._filename)
+        self._filename = check_for_double(os.path.join(self._path, self.MEDIA_PATH), self._filename)
 
     def create_hash(self):
         md5 = hashlib.md5()
@@ -70,13 +70,13 @@ class Attachment(object):
             self.create_filename(keep_file_names)
         except NameError:
             self.create_filename(True)
-        self.decodeBase64()
+        self.decode_base64()
         self.create_hash()
         self.create_file()
 
     def get_attributes(self):
         # Create a string of markdown code neatly formatted for all attributes
-        export = "\n[%s](%s%s)" % (self._filename, self.__MEDIA_PATH, self._filename)
+        export = "\n[%s](%s%s)" % (self._filename, self.MEDIA_PATH, self._filename)
         if len(self._attributes) > 0:
             export += "\n>hash: %s  " % self._hash
             for attr in self._attributes:
@@ -84,11 +84,11 @@ class Attachment(object):
             export += "\n"
         return export
 
-    def get_extention(self, mimetype):
+    def get_extension(self, mime_type):
         if self._filename.count('.') >= 1:
             return '.' + self._filename.split('.')[-1]
         else:
-            extension = mimetypes.guess_extension(mimetype)
+            extension = mimetypes.guess_extension(mime_type)
             return extension.replace('.jpe', '.jpg')
 
     def get_filename(self):
@@ -100,10 +100,10 @@ class Attachment(object):
     def get_uuid(self):
         return self._uuid
 
-    def data_stream_in(self, dataline):
-        self._base64data.append(dataline.rstrip('\n'))
+    def data_stream_in(self, data_line):
+        self._base64data.append(data_line.rstrip('\n'))
 
-    def decodeBase64(self):
+    def decode_base64(self):
         # Decode base64 image to memory
         try:
             self._raw_data = base64.b64decode(''.join(self._base64data))
