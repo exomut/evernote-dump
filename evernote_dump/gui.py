@@ -1,3 +1,5 @@
+import os
+
 from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, DISABLED, NORMAL
 
 from dump import run_parse
@@ -10,7 +12,7 @@ class EvernoteDump(Tk):
         super().__init__()
         self.settings = Settings()
 
-        self.iconbitmap('favicon.ico')
+        self.iconbitmap(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'favicon.ico'))
         self.title('Evernote Dump')
         self.geometry("500x500")
 

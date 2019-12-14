@@ -3,6 +3,7 @@
 import argparse
 import sys
 
+
 from gui import load_gui
 from dump import run_parse
 from utilities.settings import Settings
