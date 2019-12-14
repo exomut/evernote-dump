@@ -6,7 +6,7 @@ from note_parser.note_parser import NoteParser
 from utilities.settings import Settings
 
 
-def run_parse(settings: Settings):
+def run_parse(settings: Settings, print_fun=None):
     """
     Start the parsing of an Evernote enex file.
 
@@ -21,6 +21,6 @@ def run_parse(settings: Settings):
     for file in settings.files:
         base = os.path.basename(file)
         current_file = base.replace(".enex", "")
-        note_handler = NoteParser(current_file, settings)
+        note_handler = NoteParser(current_file, settings, print_fun)
         parser.setContentHandler(note_handler)
         parser.parse(file)

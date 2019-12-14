@@ -1,6 +1,8 @@
-import os
+import os, io
+from contextlib import redirect_stdout
 
-from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, DISABLED, NORMAL
+from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, scrolledtext, \
+    DISABLED, NORMAL, END
 
 from dump import run_parse
 from utilities.settings import Settings
@@ -16,12 +18,14 @@ class EvernoteDump(Tk):
 
         self.iconbitmap(os.path.join(SCRIPT_PATH, 'favicon.ico'))
         self.title('Evernote Dump')
-        self.geometry("500x500")
+        self.geometry("500x600")
 
 
 class EvernoteDumpFrame(Frame):
+
     def __init__(self, master: EvernoteDump):
         super().__init__(master)
+
         self.master = master
         self.pack(fill="both")
 
@@ -40,11 +44,14 @@ class EvernoteDumpFrame(Frame):
         self.export_dir_button = Button(text='Choose Export Directory', command=self.open_directory_picker)
         self.export_dir_button.pack(fill='x', padx=10, pady=10)
 
-        self.export_dir_label = Label(text="Please select an export directory.")
+        self.export_dir_label = Label(text="Please select an export directory")
         self.export_dir_label.pack(fill='x', padx=10, pady=10)
 
         self.run_button = Button(text='Start Evernote Conversion to Markdown', state=DISABLED, command=self.run)
         self.run_button.pack(fill='x', padx=10, pady=10)
+
+        self.log_box = scrolledtext.ScrolledText()
+        self.log_box.pack(fill='x', padx=10, pady=10)
 
     def check(self):
         if len(self.master.settings.files) > 0 and self.master.settings.export_path != '':
@@ -60,16 +67,20 @@ class EvernoteDumpFrame(Frame):
 
     def open_file_picker(self):
         self.master.settings.enex = filedialog.askopenfilenames()
-        self.export_files_list.delete(0,'end')
+        self.export_files_list.delete(0, END)
         for file in self.master.settings.enex:
             self.export_files_list.insert(0, file)
 
         self.check()
 
     def run(self):
-        self.run_button.config(state=DISABLED, text="Parsing Evernote Files...")
-        run_parse(self.master.settings)
-        self.run_button.config(text="COMPLETE")
+        self.run_button.config(state=DISABLED)
+
+        def print_callback(print_text: str):
+            self.log_box.insert(END, f"{print_text}\n")
+            self.log_box.see(END)
+
+        run_parse(self.master.settings, print_callback)
 
     def toggle_preserve(self):
         self.master.settings.p = bool(self.preserve)
