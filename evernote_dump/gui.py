@@ -1,5 +1,5 @@
-import os, io
-from contextlib import redirect_stdout
+import os
+import threading
 
 from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, scrolledtext, \
     DISABLED, NORMAL, END
@@ -32,7 +32,7 @@ class EvernoteDumpFrame(Frame):
         self.open_button = Button(text='Choose Evernote Export File(s) (.enex)', command=self.open_file_picker)
         self.open_button.pack(fill='x', padx=10, pady=10)
 
-        self.export_files_list = Listbox()
+        self.export_files_list = Listbox(height=4)
         self.export_files_list.insert(0, "No files selected.")
         self.export_files_list.pack(fill='x', padx=10, pady=10)
 
@@ -80,7 +80,7 @@ class EvernoteDumpFrame(Frame):
             self.log_box.insert(END, f"{print_text}\n")
             self.log_box.see(END)
 
-        run_parse(self.master.settings, print_callback)
+        threading.Thread(target=run_parse, args=(self.master.settings, print_callback)).start()
 
     def toggle_preserve(self):
         self.master.settings.p = bool(self.preserve)

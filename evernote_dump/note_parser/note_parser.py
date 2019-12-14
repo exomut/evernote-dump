@@ -36,7 +36,7 @@ class NoteParser(ContentHandler):
         """ Called when a new element is found """
         self.CurrentData = tag
         if tag == "en-export":  # First tag found in .enex file
-            self.print_func("\n####EXPORT STARTED####")
+            self.print_message("\n####EXPORT STARTED####")
         elif tag == "note":  # New note found
             self.note = Note()
             self.note.set_path(os.path.join(self.path, self.current_file))
@@ -56,11 +56,11 @@ class NoteParser(ContentHandler):
     #######################
     def endElement(self, tag):
         if tag == "title":
-            self.print_func(f"\nProcessing Note: {self.note.get_title()}")
+            self.print_message(f"\nProcessing Note: {self.note.get_title()}")
         elif tag == "content":
             pass
         elif tag == "resource":
-            self.print_func(f"---Exporting Attachment: {self.attachment.get_filename()}")
+            self.print_message(f"---Exporting Attachment: {self.attachment.get_filename()}")
             try:
                 self.attachment.finalize(self.settings.preserve_file_names)
             except NameError:
@@ -69,12 +69,12 @@ class NoteParser(ContentHandler):
         elif tag == "data":
             self.note.add_attachment(self.attachment)
         elif tag == "note":  # Last tag called before starting a new note
-            self.print_func(f"---Exporting Note: {self.note.get_filename()}")
+            self.print_message(f"---Exporting Note: {self.note.get_filename()}")
             self.note.finalize()
         elif tag == "note-attributes":
             self.in_note_attributes = False
         elif tag == "en-export":  # Last tag closed in the whole .enex file
-            self.print_func("\n####EXPORT FINISHED####\n")
+            self.print_message("\n####EXPORT FINISHED####\n")
 
     #######################
     # CONTENT STREAM READ #
