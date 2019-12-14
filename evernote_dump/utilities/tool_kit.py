@@ -1,7 +1,6 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import sys
 
 
 def check_for_double(path: str, filename: str) -> str:

@@ -47,10 +47,12 @@ class EvernoteDumpFrame(Frame):
     def toggle_preserve(self):
         self.master.settings.p = bool(self.preserve)
 
+
 def load_gui():
     root = EvernoteDump()
     app = EvernoteDumpFrame(root)
     app.mainloop()
+
 
 if __name__ == '__main__':
     load_gui()

@@ -29,5 +29,3 @@ if __name__ == "__main__":
         load_gui()
     else:
         run_parse(settings)
-
-

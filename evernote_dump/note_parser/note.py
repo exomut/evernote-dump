@@ -7,6 +7,8 @@ import re  # Regex module for extracting note attachments
 import html2text  # Convert html notes to markdown
 import uuid
 
+from bs4 import BeautifulSoup
+
 from note_parser.attachment import Attachment
 
 
@@ -20,7 +22,11 @@ class Note(object):
 
     def __init__(self):
         self.html2text = html2text.HTML2Text()
-        self.html2text.code = True
+        self.html2text.drop_white_space = 1
+        self.html2text.wrap_links = False
+        self.html2text.body_width = 0
+        self.html2text.wrap_list_items = False
+        self.html2text.single_line_break = True
 
         # Extracted
         self._title = ""
@@ -51,6 +57,7 @@ class Note(object):
 
     def clean_html(self):
         # Cleans self.__html and prepares it for markdown conversion.
+        self.convert_code_blocks()
         self.convert_evernote_markings()
 
         # Insert a title to be parsed in markdown
@@ -71,7 +78,16 @@ class Note(object):
 
         for take, give in replacements:
             self._html = self._html.replace(take, give)
-        
+
+    def convert_code_blocks(self):
+        soup = BeautifulSoup(self._html, "html.parser")
+        code_block = re.compile(r"-en-codeblock:true")
+        for block in soup.findAll("div", style=code_block):
+            block.insert_before('```')
+            block.insert_after('```')
+        self._html = str(soup)
+
+
     def convert_evernote_markings_attachments(self):
         # Find all attachment links in notes
         matches = re.findall(r'<en-media[^>]*\/>', self._html)
@@ -95,14 +111,29 @@ class Note(object):
         if not any(char.isalpha() or char.isdigit() for char in self._title):
             self._title = "_" + str(self._uuid)
         self._filename = check_for_double(make_dir_check(self._path), url_safe_string(self._title[:128]) + ".md")
-    
+
+    def create_placeholders(self):
+        # Create place holder to preserve spaces and tabs
+        self._html = self._html.replace("&nbsp; &nbsp; ", "[endumptab]")
+        self._html = self._html.replace("&nbsp;", "[endumpspace]")
+
+    def restore_placeholders(self):
+        self._markdown = self._markdown.replace("[endumptab]", "\t")
+        self._markdown = self._markdown.replace("[endumpspace]", " ")
+
+    def clean_markdown(self):
+        self._markdown = '\n'.join([line.rstrip() for line in self._markdown.splitlines()])
+
     def create_markdown(self):
+        self.create_placeholders()
         self.clean_html()
         self.convert_html_to_markdown()
+        self.restore_placeholders()
         self.create_markdown_attachments()
         if len(self._tags) > 0:
             self.create_markdown_note_tags()
         self.create_markdown_note_attr()
+        self.clean_markdown()
         self.create_file()
             
     def create_markdown_attachments(self):
