@@ -90,11 +90,12 @@ class Note(object):
 
     def convert_evernote_markings_attachments(self):
         # Find all attachment links in notes
-        matches = re.findall(r'<en-media[^>]*\/>', self._html)
+        matches = re.findall(r'<en-media.*?>', self._html)
+
         # Replace all attachments links with a hash placeholder
         for i in range(len(matches)):
             _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
-            if_image = "!" if "image" in matches[i] else "!"
+            if_image = "!" if "image" in matches[i] else ""
             placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
             self._html = self._html.replace(matches[i], placeholder)
 

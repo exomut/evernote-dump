@@ -1,4 +1,4 @@
-from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label
+from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, DISABLED, NORMAL
 
 from dump import run_parse
 from utilities.settings import Settings
@@ -24,30 +24,43 @@ class EvernoteDumpFrame(Frame):
         self.open_button = Button(text='Choose Evernote Export File(s) (.enex)', command=self.open_file_picker)
         self.open_button.pack(fill='x', padx=10, pady=10)
 
-        self.export_files_label = Label(text="No files selected.")
-        self.export_files_label.pack(fill='x', padx=10, pady=10)
+        self.export_files_list = Listbox()
+        self.export_files_list.insert(0, "No files selected.")
+        self.export_files_list.pack(fill='x', padx=10, pady=10)
 
         self.preserve = IntVar()
         self.preserve_names = Checkbutton(text='Preserve file names for attachments if found', variable=self.preserve,
                                           command=self.toggle_preserve)
         self.preserve_names.pack(anchor='nw', padx=10, pady=10)
 
-        self.export_dir_button = Button(text='Choose a folder to export to', command=self.choose_export_dir)
+        self.export_dir_button = Button(text='Choose Export Directory', command=self.open_directory_picker)
         self.export_dir_button.pack(fill='x', padx=10, pady=10)
 
         self.export_dir_label = Label(text="Please select an export directory.")
         self.export_dir_label.pack(fill='x', padx=10, pady=10)
 
-        self.run = Button(text='Start Evernote Conversion to Markdown', command=self.run)
-        self.run.pack(fill='x', padx=10, pady=10)
+        self.run_button = Button(text='Start Evernote Conversion to Markdown', state=DISABLED, command=self.run)
+        self.run_button.pack(fill='x', padx=10, pady=10)
 
-    def choose_export_dir(self):
+    def check(self):
+        if len(self.master.settings.files) > 0 and self.master.settings.export_path != '':
+            self.run_button.config(state=NORMAL)
+        else:
+            self.run_button.config(state=DISABLED)
+
+    def open_directory_picker(self):
         self.master.settings.path = filedialog.askdirectory()
         self.export_dir_label.config(text=f"{self.master.settings.path}")
 
+        self.check()
+
     def open_file_picker(self):
         self.master.settings.enex = filedialog.askopenfilenames()
-        self.export_files_label.config(text=f"{str(self.master.settings.enex)}")
+        self.export_files_list.delete(0,'end')
+        for file in self.master.settings.enex:
+            self.export_files_list.insert(0, file)
+
+        self.check()
 
     def run(self):
         run_parse(self.master.settings)
