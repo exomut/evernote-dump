@@ -20,6 +20,8 @@ class Note(object):
 
     def __init__(self):
         self.html2text = html2text.HTML2Text()
+        self.html2text.code = True
+
         # Extracted
         self._title = ""
         self._html = ""
@@ -46,11 +48,7 @@ class Note(object):
         
     def append_tag(self, tag):
         self._tags.append(tag)
-    
-    def append_to_notemd(self, text):
-        # Adds a new line of text to the markdown version of the note
-        self.__notemd += "\n" + text
-        
+
     def clean_html(self):
         # Cleans self.__html and prepares it for markdown conversion.
         self.convert_evernote_markings()
@@ -63,7 +61,8 @@ class Note(object):
 
         replacements = (
             # Handle Checkboxes
-            ('<en-todo checked="false"/>', '-<ignore> [ ] '),    # without this hack html2text will convert '-' to '\\-' because there is space after dash
+            # without this workaround html2text will convert '-' to '\\-' because there is space after dash
+            ('<en-todo checked="false"/>', '-<ignore> [ ] '),
             ('<en-todo checked="false">', '-<ignore> [ ] '),
             ('<en-todo checked="true"/>', '-<ignore> [x] '),
             ('<en-todo checked="true">', '-<ignore> [x] '),

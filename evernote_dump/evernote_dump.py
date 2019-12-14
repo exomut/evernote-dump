@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from gui import EvernoteDumpGui
+from gui import load_gui
 from dump import run_parse
 from utilities.settings import Settings
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     arg_parser.parse_args(namespace=settings)
 
     if len(sys.argv) == 1:
-        EvernoteDumpGui().mainloop()
+        load_gui()
     else:
         run_parse(settings)
 
