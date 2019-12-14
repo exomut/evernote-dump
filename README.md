@@ -6,6 +6,8 @@ All notes and attachments will keep their original file created and accessed dat
 
 Evernote Dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
+![Screen Shot](screenshot.png)
+
 ## Requirements 
 
 ```
@@ -33,7 +35,7 @@ python evernote_dump.py *
 ```
 A folder will be created for each 'enex' file and the notes and media will be saved in that folder.
 
-# Evernote Enex File Map
+## Evernote Enex File Map
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
