@@ -60,6 +60,16 @@ class Note(object):
         self.convert_code_blocks()
         self.convert_evernote_markings()
 
+        # Remove troublesome 'divs' from tables
+        for match in re.findall(r"<tbody>.*?<\/tbody>", self._html):
+            self._html = self._html.replace(match, "[evernote-dump-table-cleaner]")
+            match = match.replace("<div><br/></div>","")
+            for div in re.findall(r"<div>(?!<div>).*?<\/div>", match):
+                clean_div = div.replace("<div>", "").replace("</div>", "")
+                match = match.replace(div, clean_div)
+            self._html = self._html.replace("[evernote-dump-table-cleaner]", match)
+
+
         # Insert a title to be parsed in markdown
         self._html = ("<h1>" + self._title + "</h1>" + self._html).encode('utf-8')
         
