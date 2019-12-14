@@ -5,6 +5,8 @@ from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, L
 from dump import run_parse
 from utilities.settings import Settings
 
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 class EvernoteDump(Tk):
 
@@ -12,7 +14,7 @@ class EvernoteDump(Tk):
         super().__init__()
         self.settings = Settings()
 
-        self.iconbitmap(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'favicon.ico'))
+        self.iconbitmap(os.path.join(SCRIPT_PATH, 'favicon.ico'))
         self.title('Evernote Dump')
         self.geometry("500x500")
 
@@ -65,7 +67,9 @@ class EvernoteDumpFrame(Frame):
         self.check()
 
     def run(self):
+        self.run_button.config(state=DISABLED, text="Parsing Evernote Files...")
         run_parse(self.master.settings)
+        self.run_button.config(text="COMPLETE")
 
     def toggle_preserve(self):
         self.master.settings.p = bool(self.preserve)
