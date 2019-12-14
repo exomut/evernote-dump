@@ -12,29 +12,26 @@ Evernote Dump works by streaming the .enex file through a parser so even extreme
 pip install -r requirements.txt
 ```
 
-## Running: Gui
+## Running: GUI
 
-The GUI is not functional right now. I am transitioning away from Kivy to TKinter.
 
 ```
 python evernote_dump.py
 ```
 
-## Running: Command Line:
+## Running: Command Line
 
 ```
-python run_script.py FILE.enex
+# For a full list of commands
+python evernote_dump.py -h
+
+# Dump to current directory
+python evernote_dump.py FILE.enex
+
+# Batch dump
+python evernote_dump.py *
 ```
-
-or for exporting all enex files in a folder, use:  
-
-```
-python run_script.py *  
-```
-
-All attachments found will be output the the "ENEX-FILE-NAME-ROOT/media" folder as where you called evernote_dump.py .
-
-All the files found in the enex files will be put in the folder
+A folder will be created for each 'enex' file and the notes and media will be saved in that folder.
 
 # Evernote Enex File Map
 
