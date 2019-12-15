@@ -57,6 +57,11 @@ class Attachment(object):
             # Create a filename from created date if none found or unwanted
             self._filename = self._created_date.strftime(self.TIME_FORMAT) + '.' + extension
 
+        clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
+                 ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
+        for a, b in clean:
+            self._filename = self._filename.replace(a, b)
+
         # Remove spaces from filenames since markdown links won't work with spaces
         self._filename = self._filename.replace(" ", "_")
 
