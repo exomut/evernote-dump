@@ -123,6 +123,11 @@ class Note(object):
             self._title = "_" + str(self._uuid)
         self._filename = check_for_double(make_dir_check(self._path), url_safe_string(self._title[:128]) + ".md")
 
+        clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
+                 ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
+        for a, b in clean:
+            self._filename = self._filename.replace(a, b)
+
     def create_placeholders(self):
         # Create place holder to preserve spaces and tabs
         self._html = self._html.replace("&nbsp; &nbsp; ", "[endumptab]")
@@ -191,10 +196,16 @@ class Note(object):
         self._attachments.append(Attachment(filename))
         
     def set_created_date(self, date_string):
-        self._created_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
+        try:
+            self._created_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
+        except (TypeError, ValueError):
+            self._created_date = datetime.now().strftime(self.ISO_DATE_FORMAT)
     
     def set_updated_date(self, date_string):
-        self._updated_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
+        try:
+            self._updated_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
+        except (TypeError, ValueError):
+            self._created_date = datetime.now().strftime(self.ISO_DATE_FORMAT)
 
     def set_path(self, path):
         self._path = path

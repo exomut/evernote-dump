@@ -42,10 +42,13 @@ class Attachment(object):
             extension = self._filename.split('.')[-1]
             base = self._filename.rstrip('.' + extension)
         else:
-            # Create an extension if no original filename found.
-            extension = mimetypes.guess_extension(self._mime, False)[1:]
-            if extension == "jpe":
-                extension = "jpg"
+            try:
+                # Create an extension if no original filename found.
+                extension = mimetypes.guess_extension(self._mime, False)[1:]
+                if extension == "jpe":
+                    extension = "jpg"
+            except (ValueError, TypeError):
+                extension = "unknown"
 
         if keep_file_names and base:
             # Limit filename length to 128 characters
