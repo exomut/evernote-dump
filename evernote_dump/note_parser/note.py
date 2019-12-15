@@ -121,12 +121,14 @@ class Note(object):
         # make sure title can be converted to filename
         if not any(char.isalpha() or char.isdigit() for char in self._title):
             self._title = "_" + str(self._uuid)
-        self._filename = check_for_double(make_dir_check(self._path), url_safe_string(self._title[:128]) + ".md")
 
         clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
                  ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
         for a, b in clean:
             self._filename = self._filename.replace(a, b)
+
+        self._filename = check_for_double(make_dir_check(self._path), url_safe_string(self._title[:128]) + ".md")
+
 
     def create_placeholders(self):
         # Create place holder to preserve spaces and tabs
