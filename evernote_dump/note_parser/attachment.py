@@ -5,7 +5,7 @@ import binascii  # Used to convert hash output to string
 import os
 from datetime import datetime
 
-from utilities.tool_kit import check_for_double, make_dir_check, url_safe_string
+from utilities.tool_kit import check_for_double, make_dir_check, path_safe_string
 
 
 class Attachment(object):
@@ -55,15 +55,10 @@ class Attachment(object):
 
         if keep_file_names and base:
             # Limit filename length to 128 characters
-            self._filename = url_safe_string(base[:128]) + '.' + extension
+            self._filename = path_safe_string(base[:128]) + '.' + extension
         else:
             # Create a filename from created date if none found or unwanted
             self._filename = self._created_date.strftime(self.TIME_FORMAT) + '.' + extension
-
-        clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
-                 ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
-        for a, b in clean:
-            self._filename = self._filename.replace(a, b)
 
         # Remove spaces from filenames since markdown links won't work with spaces
         self._filename = self._filename.replace(" ", "_")

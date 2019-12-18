@@ -64,7 +64,7 @@ def multi_choice(choices: tuple) -> int:
             return result
 
 
-def url_safe_string(text: str) -> str:
+def path_safe_string(text: str) -> str:
     """
     Cleans the provided string for export to file system.
 
@@ -75,4 +75,11 @@ def url_safe_string(text: str) -> str:
     """
     for c in r'[]/\;,><&*:%=+@!#^()|?^':
         text = text.replace(c, '')
+
+    clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
+             ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
+
+    for a, b in clean:
+        text = text.replace(a, b)
+
     return text

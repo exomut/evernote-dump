@@ -98,7 +98,6 @@ class Note(object):
             block.insert_after('```')
         self._html = str(soup)
 
-
     def convert_evernote_markings_attachments(self):
         # Find all attachment links in notes
         matches = re.findall(r'<en-media.*?>', self._html)
@@ -123,13 +122,7 @@ class Note(object):
         if not any(char.isalpha() or char.isdigit() for char in self._title):
             self._title = "_" + str(self._uuid)
 
-        clean = (("/", "／"), ("*", "＊"), (":", "："), ("¥", "￥"),
-                 ("?", "？"), ('"', "“"), ("<", "＜"), (">", "＞"), ("|", "-"))
-        for a, b in clean:
-            self._filename = self._filename.replace(a, b)
-
-        self._filename = check_for_double(make_dir_check(self._path), url_safe_string(self._title[:128]) + ".md")
-
+        self._filename = check_for_double(make_dir_check(self._path), path_safe_string(self._title[:128]) + ".md")
 
     def create_placeholders(self):
         # Create place holder to preserve spaces and tabs
@@ -195,8 +188,8 @@ class Note(object):
     def get_uuid(self):
         return self._uuid
 
-    def new_attachment(self, filename):
-        self._attachments.append(Attachment(filename))
+    def new_attachment(self):
+        self._attachments.append(Attachment())
         
     def set_created_date(self, date_string):
         try:
