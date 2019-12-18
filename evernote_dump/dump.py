@@ -10,10 +10,11 @@ def run_parse(settings: Settings, print_fun=None):
     """
     Start the parsing of an Evernote enex file.
 
-    :args
-
-
+    :param settings: Settings is a custom class to pass application wide settings.
+    :param print_fun: func Pass in a callback function that will be passed a string for printing
+                            and disable printing to console.
     """
+
     # Setup xml parser
     parser = make_parser()
     parser.setFeature(handler.feature_namespaces, 0)

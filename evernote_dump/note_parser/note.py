@@ -12,10 +12,11 @@ from bs4 import BeautifulSoup
 from note_parser.attachment import Attachment
 
 
-##############
-# Note Class #
-##############
 class Note(object):
+    """
+    Note Class organizes and exports all parsed data and exports to a markdown file.
+    """
+
     MEDIA_PATH = "media/"
     ISO_DATE_FORMAT = "%Y%m%dT%H%M%SZ"
     TIME_FORMAT = "%Y-%m-%d %H:%M:%S"

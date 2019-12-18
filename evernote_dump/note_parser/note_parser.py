@@ -8,6 +8,15 @@ from .note import Note, Attachment
 
 
 class NoteParser(ContentHandler):
+    """
+    Handles all lines of the enex file in a streaming manner.
+    Large files can be parsed since it is not loaded to memory.
+
+    :param current_file
+    :param settings: Settings is a custom class to pass application wide settings.
+    :param print_fun: func Pass in a callback function that will be passed a string for printing
+        and disable printing to console.
+    """
 
     def __init__(self, current_file, settings: Settings, print_func=None):
         super().__init__()
@@ -29,9 +38,6 @@ class NoteParser(ContentHandler):
         else:
             print(message)
 
-    ######################
-    # ELEMENT READ START #
-    ######################
     def startElement(self, tag, attributes):
         """ Called when a new element is found """
         self.CurrentData = tag
@@ -51,10 +57,8 @@ class NoteParser(ContentHandler):
         elif tag == "resource-attributes":
             self.in_resource_attributes = True
 
-    #######################
-    # ELEMENT READ FINISH #
-    #######################
     def endElement(self, tag):
+        """Called at the end of an element"""
         if tag == "title":
             self.print_message(f"\nProcessing Note: {self.note.get_title()}")
         elif tag == "content":
@@ -76,10 +80,8 @@ class NoteParser(ContentHandler):
         elif tag == "en-export":  # Last tag closed in the whole .enex file
             self.print_message("\n####EXPORT FINISHED####\n")
 
-    #######################
-    # CONTENT STREAM READ #
-    #######################
     def characters(self, content_stream):
+        """Content Stream"""
         if self.CurrentData == "title":
             self.note.set_title(content_stream)
         elif self.CurrentData == "content":

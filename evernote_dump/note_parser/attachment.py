@@ -9,11 +9,14 @@ from utilities.tool_kit import check_for_double, make_dir_check, url_safe_string
 
 
 class Attachment(object):
+    """
+    Attachment Class convert the base64 byte string into an actual file.
+    File name extension is guessed from mime type if not found.
+    """
     MEDIA_PATH = "media/"
     TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
     def __init__(self):
-        """Take in encrypted data, un-encrypt it, save to a file, gather attributes"""
         self._created_date = datetime.now()
         self._filename = ""
         self._mime = ""

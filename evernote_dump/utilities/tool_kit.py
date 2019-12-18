@@ -28,14 +28,15 @@ def check_for_double(path: str, filename: str) -> str:
     return temp_file_name
 
 
-def make_dir_check(path):
+def make_dir_check(path: str) -> str:
     """
     # Check if path exists. If not found path is created
     # and the path is returned.
 
-    path: location of new directory
+    :param path: str location of new directory
 
-    returns: path
+    :return: path
+    :rtype: str
     """
     if not os.path.exists(path):
         os.makedirs(path)
@@ -48,6 +49,7 @@ def multi_choice(choices: tuple) -> int:
     Prints the choices to console including a number for choosing.
 
     :param choices: tuple Strings for user to make a choice
+
     :return: Returns the index value for the choice
     :rtype: int
     """
@@ -62,7 +64,15 @@ def multi_choice(choices: tuple) -> int:
             return result
 
 
-def url_safe_string(text):
+def url_safe_string(text: str) -> str:
+    """
+    Cleans the provided string for export to file system.
+
+    :param text: string Text to be cleaned.
+
+    :return: Cleaned string
+    :rtype: str
+    """
     for c in r'[]/\;,><&*:%=+@!#^()|?^':
         text = text.replace(c, '')
     return text
