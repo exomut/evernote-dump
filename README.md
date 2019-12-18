@@ -6,7 +6,7 @@ All notes and attachments will keep their original file created and accessed dat
 
 Evernote Dump works by streaming the .enex file through a parser so even extremely large .enex files _should_ work.
 
-![Screen Shot](screenshot.png)
+![Screen Shot](images/screenshot.png)
 
 ## Requirements 
 
@@ -15,7 +15,6 @@ pip install -r requirements.txt
 ```
 
 ## Running: GUI
-
 
 ```
 python evernote_dump.py
@@ -34,6 +33,36 @@ python evernote_dump.py FILE.enex
 python evernote_dump.py *
 ```
 A folder will be created for each 'enex' file and the notes and media will be saved in that folder.
+
+## Exporting Notes from Evernote
+
+### Step 1:
+
+Download [Evernote Desktop](https://evernote.com/download), install the desktop client, and log-in.
+
+### Step 2:
+
+Select which Notebook you want to export or All Notes. Select one of the notes and on the menu bar choose [Edit] >> [Select All].
+
+I recommending exporting each Evernote Notebook individually to keep your note structure.
+
+Evernote Dump can handle mutlipla files at the same time and export each file to its own folder.
+
+![Select Notes](images/select_all.png)
+
+### Step 3:
+
+Select [File] >> [Export] from the menu bar.
+
+![Menu](images/menu.png)
+
+### Step 4:
+
+Make sure "Export as a file in ENEX format (.enex)" is selected and click [Export] and choose a directory for exporting.
+
+![Export](images/export_menu.png)
+
+You are now ready to run **Evernote Dump**.
 
 ## Evernote Enex File Map
 
