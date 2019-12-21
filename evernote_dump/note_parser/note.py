@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from utilities.tool_kit import *
-from datetime import datetime
 import re  # Regex module for extracting note attachments
-import html2text  # Convert html notes to markdown
 import uuid
+from datetime import datetime
 
+import html2text  # Convert html notes to markdown
 from bs4 import BeautifulSoup
 
 from note_parser.attachment import Attachment
+from utilities.tool_kit import *
 
 
 class Note(object):
@@ -52,7 +52,7 @@ class Note(object):
 
     def append_html(self, text):
         self._html += text
-        
+
     def append_tag(self, tag):
         self._tags.append(tag)
 
@@ -64,16 +64,15 @@ class Note(object):
         # Remove troublesome 'divs' from tables
         for match in re.findall(r"<tbody>.*?<\/tbody>", self._html):
             self._html = self._html.replace(match, "[evernote-dump-table-cleaner]")
-            match = match.replace("<div><br/></div>","")
+            match = match.replace("<div><br/></div>", "")
             for div in re.findall(r"<div>(?!<div>).*?<\/div>", match):
                 clean_div = div.replace("<div>", "").replace("</div>", "")
                 match = match.replace(div, clean_div)
             self._html = self._html.replace("[evernote-dump-table-cleaner]", match)
 
-
         # Insert a title to be parsed in markdown
         self._html = ("<h1>" + self._title + "</h1>" + self._html).encode('utf-8')
-        
+
     def convert_evernote_markings(self):
         self.convert_evernote_markings_attachments()
 
@@ -106,7 +105,7 @@ class Note(object):
         for i in range(len(matches)):
             _hash = re.findall(r'[a-zA-Z0-9]{32}', matches[i])
             if_image = "!" if "image" in matches[i] else ""
-            placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i+1, _hash[0])
+            placeholder = "\n%s[noteattachment%d][%s]" % (if_image, i + 1, _hash[0])
             self._html = self._html.replace(matches[i], placeholder)
 
     def convert_html_to_markdown(self):
@@ -115,7 +114,8 @@ class Note(object):
     def create_file(self):
         with open(os.path.join(self._path, self._filename), 'w', encoding='UTF-8', errors='replace') as outfile:
             outfile.write(self._markdown)
-        os.utime(os.path.join(self._path, self._filename), (self._created_date.timestamp(), self._updated_date.timestamp()))
+        os.utime(os.path.join(self._path, self._filename),
+                 (self._created_date.timestamp(), self._updated_date.timestamp()))
 
     def create_filename(self):
         # make sure title can be converted to filename
@@ -147,16 +147,17 @@ class Note(object):
         self.create_markdown_note_attr()
         self.clean_markdown()
         self.create_file()
-            
+
     def create_markdown_attachments(self):
         # Appends the attachment information in markdown format to self.__markdown
         if len(self._attachments) > 0:
             self._markdown += "\n---"
             self._markdown += "\n### ATTACHMENTS"
             for i in range(len(self._attachments)):
-                self._markdown += "\n[%s]: %s%s" % (self._attachments[i].get_hash(), self.MEDIA_PATH, self._attachments[i].get_filename())
+                self._markdown += "\n[%s]: %s%s" % (
+                    self._attachments[i].get_hash(), self.MEDIA_PATH, self._attachments[i].get_filename())
                 self._markdown += self._attachments[i].get_attributes()
-                
+
     def create_markdown_note_attr(self):
         self._markdown += "\n---"
         self._markdown += "\n### NOTE ATTRIBUTES"
@@ -165,7 +166,7 @@ class Note(object):
         if len(self._attributes) > 0:
             for attr in self._attributes:
                 self._markdown += "\n>%s: %s  " % (attr[0], attr[1])
-        
+
     def create_markdown_note_tags(self):
         self._markdown += "\n\n---"
         self._markdown += "\n### TAGS\n"
@@ -178,25 +179,25 @@ class Note(object):
 
     def get_created_date(self):
         return self._created_date
-    
+
     def get_filename(self):
         return self._filename
 
     def get_title(self):
         return self._title
-    
+
     def get_uuid(self):
         return self._uuid
 
     def new_attachment(self):
         self._attachments.append(Attachment())
-        
+
     def set_created_date(self, date_string):
         try:
             self._created_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
         except (TypeError, ValueError):
             self._created_date = datetime.now().strftime(self.ISO_DATE_FORMAT)
-    
+
     def set_updated_date(self, date_string):
         try:
             self._updated_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
@@ -205,7 +206,7 @@ class Note(object):
 
     def set_path(self, path):
         self._path = path
-        
+
     def set_title(self, title):
         self._title = title
         self.create_filename()

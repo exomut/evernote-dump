@@ -1,6 +1,6 @@
 # Evernote Dump
 
-**Evernote Dump** exports and extracts evernote notes and attachments from .enex files.
+**Evernote Dump** exports and extracts Evernote notes and attachments from .enex files.
 
 All notes and attachments will keep their original file created and accessed dates. Notes will be converted to markdown format. Tags and other embedded information will be formatted and added to the end of each note.
 
@@ -46,7 +46,7 @@ Select which Notebook you want to export or All Notes. Select one of the notes a
 
 I recommending exporting each Evernote Notebook individually to keep your note structure.
 
-Evernote Dump can handle mutlipla files at the same time and export each file to its own folder.
+Evernote Dump can handle multiple files at the same time and export each file to its own folder.
 
 ![Select Notes](images/select_all.png)
 
