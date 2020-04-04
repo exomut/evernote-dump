@@ -196,7 +196,7 @@ class Note(object):
         try:
             self._created_date = datetime.strptime(date_string, self.ISO_DATE_FORMAT)
         except (TypeError, ValueError):
-            self._created_date = datetime.now().strftime(self.ISO_DATE_FORMAT)
+            self._created_date = datetime.now()
 
     def set_updated_date(self, date_string):
         try:
