@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import os
 from xml.sax import make_parser, handler
-from note_parser.note_parser import NoteParser
-from utilities.settings import Settings
+from .note_parser.note_parser import NoteParser
+from .utilities.settings import Settings
 
 
 def run_parse(settings: Settings, print_fun=None):

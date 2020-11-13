@@ -8,39 +8,40 @@ Evernote Dump works by streaming the .enex file through a parser so even extreme
 
 ![Screen Shot](images/screenshot.png)
 
-## Requirements 
+## Requirements
 
-```
+```Bash
 pip install -r requirements.txt
 ```
 
 ## Running: GUI
 
-```
-python evernote_dump.py
+```Bash
+python -m evernote_dump
 ```
 
 ## Running: Command Line
 
-```
+```Bash
 # For a full list of commands
-python evernote_dump.py -h
+python -m evernote_dump -h
 
 # Dump to current directory
-python evernote_dump.py FILE.enex
+python -m evernote_dump FILE.enex
 
 # Batch dump
-python evernote_dump.py *
+python -m evernote_dump *
 ```
+
 A folder will be created for each 'enex' file and the notes and media will be saved in that folder.
 
 ## Exporting Notes from Evernote
 
-### Step 1:
+### Step 1
 
 Download [Evernote Desktop](https://evernote.com/download), install the desktop client, and log-in.
 
-### Step 2:
+### Step 2
 
 Select which Notebook you want to export or All Notes. Select one of the notes and on the menu bar choose [Edit] >> [Select All].
 
@@ -50,13 +51,13 @@ Evernote Dump can handle multiple files at the same time and export each file to
 
 ![Select Notes](images/select_all.png)
 
-### Step 3:
+### Step 3
 
 Select [File] >> [Export] from the menu bar.
 
 ![Menu](images/menu.png)
 
-### Step 4:
+### Step 4
 
 Make sure "Export as a file in ENEX format (.enex)" is selected and click [Export] and choose a directory for exporting.
 
@@ -107,14 +108,14 @@ You are now ready to run **Evernote Dump**.
             <height>720</height>
             <resource-attributes>
                 <file-name>snapshot-DAE9FC15-88E3-46CF-B744-DA9B1B56EB57.jpg</file-name>
-				<source-url>www.google.com</source-url>
-            	<latitude>33.88394692352314</latitude>
-            	<longitude>-117.9191355110099</longitude>
-            	<altitude>96</altitude>
-				<camera-make>Sharp</camera-make>
-				<camera-model>23</camera-model>
-				<attachment>true</attachment> #DOUBLE CHECK
-				<application-data>Developer place 4K</application-data>
+                <source-url>www.google.com</source-url>
+                <latitude>33.88394692352314</latitude>
+                <longitude>-117.9191355110099</longitude>
+                <altitude>96</altitude>
+                <camera-make>Sharp</camera-make>
+                <camera-model>23</camera-model>
+                <attachment>true</attachment> #DOUBLE CHECK
+                <application-data>Developer place 4K</application-data>
 
             </resource-attributes>
         </resource>

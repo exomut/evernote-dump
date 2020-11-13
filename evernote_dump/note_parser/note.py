@@ -8,8 +8,8 @@ from datetime import datetime
 import html2text  # Convert html notes to markdown
 from bs4 import BeautifulSoup
 
-from note_parser.attachment import Attachment
-from utilities.tool_kit import *
+from .attachment import Attachment
+from ..utilities.tool_kit import *
 
 
 class Note(object):
@@ -57,7 +57,7 @@ class Note(object):
         self._tags.append(tag)
 
     def clean_html(self):
-        # Cleans self.__html and prepares it for markdown conversion.
+        # Cleans self._html and prepares it for markdown conversion.
         self.convert_code_blocks()
         self.convert_evernote_markings()
 

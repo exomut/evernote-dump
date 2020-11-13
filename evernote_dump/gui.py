@@ -4,8 +4,8 @@ import threading
 from tkinter import Tk, filedialog, Button, Frame, Checkbutton, IntVar, Label, Listbox, scrolledtext, \
     DISABLED, NORMAL, END
 
-from dump import run_parse
-from utilities.settings import Settings
+from .dump import run_parse
+from .utilities.settings import Settings
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 

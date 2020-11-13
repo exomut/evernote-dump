@@ -5,7 +5,7 @@ import binascii  # Used to convert hash output to string
 import os
 from datetime import datetime
 
-from utilities.tool_kit import check_for_double, make_dir_check, path_safe_string
+from ..utilities.tool_kit import check_for_double, make_dir_check, path_safe_string
 
 
 class Attachment(object):

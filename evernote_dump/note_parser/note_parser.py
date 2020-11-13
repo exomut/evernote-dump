@@ -3,7 +3,7 @@
 import os
 from xml.sax import ContentHandler
 
-from utilities.settings import Settings
+from ..utilities.settings import Settings
 from .note import Note, Attachment
 
 
