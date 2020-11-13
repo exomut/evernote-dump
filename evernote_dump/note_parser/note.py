@@ -51,7 +51,7 @@ class Note(object):
         self._attributes.append([attr, dataline])
 
     def append_html(self, text):
-        self._html += text
+        self._html = str(self._html) + text
 
     def append_tag(self, tag):
         self._tags.append(tag)
