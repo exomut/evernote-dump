@@ -10,6 +10,11 @@ Evernote Dump works by streaming the .enex file through a parser so even extreme
 
 ## Requirements
 
+The newest version of Evernote will not work with Evernote-Dump. You need to download a legacy version of Evernote:
+[Legacy Evernote](https://help.evernote.com/hc/en-us/articles/360052560314-Install-an-older-version-of-Evernote) (Mac and Windows versions are available)
+
+Install Python requirements:
+
 ```Bash
 pip install -r requirements.txt
 ```
@@ -39,7 +44,7 @@ A folder will be created for each 'enex' file and the notes and media will be sa
 
 ### Step 1
 
-Download [Evernote Desktop](https://evernote.com/download), install the desktop client, and log-in.
+Download [Legacy Evernote](https://help.evernote.com/hc/en-us/articles/360052560314-Install-an-older-version-of-Evernote), install the desktop client, and log-in.
 
 ### Step 2
 
