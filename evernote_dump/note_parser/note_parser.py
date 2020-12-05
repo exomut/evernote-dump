@@ -65,10 +65,7 @@ class NoteParser(ContentHandler):
             pass
         elif tag == "resource":
             self.print_message(f"---Exporting Attachment: {self.attachment.get_filename()}")
-            try:
-                self.attachment.finalize(self.settings.preserve_file_names)
-            except NameError:
-                self.attachment.finalize(True)
+            self.attachment.finalize(self.settings)
             self.in_resource_attributes = False
         elif tag == "data":
             self.note.add_attachment(self.attachment)
@@ -97,7 +94,8 @@ class NoteParser(ContentHandler):
         elif self.CurrentData == "mime":
             self.attachment.set_mime(content_stream)
         elif self.CurrentData == "file-name":
-            self.attachment.set_filename(content_stream)
+            if (not self.settings.use_note_title_for_attachments):
+                self.attachment.set_filename(content_stream)
 
         if self.in_note_attributes:
             self.note.add_found_attribute(self.CurrentData, content_stream)

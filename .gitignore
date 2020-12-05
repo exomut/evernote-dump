@@ -8,6 +8,12 @@
 .idea
 .vscode
 
+# Visual Studio
+/.vs
+/*.pyproj
+/*.sln
+/run.py
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml

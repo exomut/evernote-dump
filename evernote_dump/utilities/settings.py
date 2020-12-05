@@ -8,6 +8,7 @@ class Settings:
         self.files = []
         self.export_path = ""
         self.preserve_file_names = False
+        self.use_note_title_for_attachments = False
 
     @property
     def path(self):
@@ -24,6 +25,14 @@ class Settings:
     @p.setter
     def p(self, p: bool):
         self.preserve_file_names = p
+
+    @property
+    def n(self):
+        return self.use_note_title_for_attachments
+
+    @n.setter
+    def n(self, n: bool):
+        self.use_note_title_for_attachments = n
 
     @property
     def enex(self):

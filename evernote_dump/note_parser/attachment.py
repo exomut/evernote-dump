@@ -38,7 +38,7 @@ class Attachment(object):
         os.utime(path, (self._created_date.timestamp(), self._created_date.timestamp()))
         self._raw_data = b""
 
-    def create_filename(self, keep_file_names):
+    def create_filename(self, settings):
         base = self._filename
 
         if self._filename.count('.') >= 1:
@@ -52,8 +52,7 @@ class Attachment(object):
                     extension = "jpg"
             except (ValueError, TypeError):
                 extension = "unknown"
-
-        if keep_file_names and base:
+        if (settings.preserve_file_names and base) or settings.use_note_title_for_attachments:
             # Limit filename length to 128 characters
             self._filename = path_safe_string(base[:128]) + '.' + extension
         else:
@@ -71,11 +70,11 @@ class Attachment(object):
         md5.update(self._raw_data)
         self._hash = binascii.hexlify(md5.digest()).decode()
 
-    def finalize(self, keep_file_names):
+    def finalize(self, settings):
         try:
-            self.create_filename(keep_file_names)
+            self.create_filename(settings)
         except NameError:
-            self.create_filename(True)
+            self.create_filename(None)
         self.decode_base64()
         self.create_hash()
         self.create_file()

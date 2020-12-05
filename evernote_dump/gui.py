@@ -41,6 +41,11 @@ class EvernoteDumpFrame(Frame):
                                           command=self.toggle_preserve)
         self.preserve_names.pack(anchor='nw', padx=10, pady=10)
 
+        self.use_title = IntVar()
+        self.use_title_for_names = Checkbutton(text='Use the note\'s title for file attachments', variable=self.use_title,
+                                          command=self.toggle_use_title)
+        self.use_title_for_names.pack(anchor='nw', padx=10, pady=10)
+
         self.export_dir_button = Button(text='Choose Export Directory', command=self.open_directory_picker)
         self.export_dir_button.pack(fill='x', padx=10, pady=10)
 
@@ -84,6 +89,13 @@ class EvernoteDumpFrame(Frame):
 
     def toggle_preserve(self):
         self.master.settings.p = bool(self.preserve)
+        self.master.settings.n = False
+        self.use_title_for_names.deselect()
+
+    def toggle_use_title(self):
+        self.master.settings.n = bool(self.preserve)
+        self.master.settings.p = False
+        self.preserve_names.deselect()
 
 
 def load_gui():
